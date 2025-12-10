@@ -40,6 +40,8 @@ class NGreenCandles(Indicator):
         if not isinstance(N, int) or 2 < N <= 0:
             raise ValueError("'n_candles_operation' must be a 1 or 2.")
             
+        Y = params.get('n_candles_offset', 0)  # Offset (e.g., 0 for current, 2 for two periods ago)
+
         # --- 2. Data Validation ---
         required_cols = ['Open', 'Close']
         if not all(col in data.columns for col in required_cols):
@@ -49,9 +51,18 @@ class NGreenCandles(Indicator):
             # Not enough historical data to satisfy the N lookback period
             return 0 
         
+        # The end point of the slice (exclusive index)
+        # If Y=0, end_index is data_length (last row index + 1) -> data.iloc[start:data_length]
+        # If Y=2, end_index is data_length - 2
+        end_index = len(data) - Y
+        
+        # The start point of the slice (inclusive index)
+        # Start N periods before the end_index
+        start_index = end_index - N
+
         # --- 3. Extract Recent Data ---
         # Get the last N rows of the DataFrame
-        recent_data = data.iloc[-N:]
+        recent_data = data.iloc[start_index:end_index]
         
         # --- 4. Determine Candle Color ---
         # A candle is green (bullish) if Close > Open.

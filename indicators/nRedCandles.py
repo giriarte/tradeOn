@@ -28,16 +28,18 @@ class NRedCandles(Indicator):
         default_n = 3 # Default lookback if not provided
 
         n_candles_operation = 1 # Default operation is to buy, but it can be changed by parameter to 2 (sell)
-        n_candles = default_n
+        N = default_n
         
         if params and 'n_candles' in params:
-            n_candles = params['n_candles']
+            N = params['n_candles']
             
         if params and 'n_candles_operation' in params:
             n_candles_operation = params['n_candles_operation']
         
+        Y = params.get('n_candles_offset', 0)  # Offset (e.g., 0 for current, 2 for two periods ago)
+
         # 2. Data Validation
-        if not isinstance(data, pd.DataFrame) or len(data) < n_candles:
+        if not isinstance(data, pd.DataFrame) or len(data) < N:
             # Not enough data or incorrect type, return Hold (0)
             return 0
         
@@ -47,8 +49,18 @@ class NRedCandles(Indicator):
         
         # 3. Logic: Check the last N candles
         
-        # Get the last N rows of data
-        recent_data = data.iloc[-n_candles:]
+        # The end point of the slice (exclusive index)
+        # If Y=0, end_index is data_length (last row index + 1) -> data.iloc[start:data_length]
+        # If Y=2, end_index is data_length - 2
+        end_index = len(data) - Y
+        
+        # The start point of the slice (inclusive index)
+        # Start N periods before the end_index
+        start_index = end_index - N
+
+        # --- 3. Extract Recent Data ---
+        # Get the last N rows of the DataFrame
+        recent_data = data.iloc[start_index:end_index]
         
         # A candle is "red" (bearish) if its Close price is less than its Open price.
         # We create a boolean Series where True = Red Candle.
