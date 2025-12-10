@@ -1,6 +1,10 @@
 import unittest
 import pandas as pd
 from indicators.nRedCandles import NRedCandles
+from indicators.constants import ( 
+    N_CANDLES_LENGTH,
+    N_CANDLES_OPERATION
+)
 
 class TestNRedCandles(unittest.TestCase):
     
@@ -50,7 +54,7 @@ class TestNRedCandles(unittest.TestCase):
 
     def test_successful_buy_signal_default_n(self):
         """Test case where the last 3 (default N) candles are red."""
-        params = {'n_candles': 3}
+        params = {N_CANDLES_LENGTH: 3}
         result = self.indicator.evaluate(self.df_match, params)
         # Expect 1 (default n_candles_operation is 1 for Buy)
         self.assertEqual(result, 1, "Should return 1 when last 3 candles are red")
@@ -58,41 +62,41 @@ class TestNRedCandles(unittest.TestCase):
     def test_successful_buy_signal_custom_n(self):
         """Test case with a custom N (4 candles)."""
         # Data df_fail_green has 4 candles: [R, R, G, R]. Check N=1 (R) -> Success
-        params = {'n_candles': 1}
+        params = {N_CANDLES_LENGTH: 1}
         result = self.indicator.evaluate(self.df_fail_green, params)
         self.assertEqual(result, 1, "Should return 1 when N=1 and the last candle is red")
         
     def test_failure_due_to_green_candle(self):
         """Test case where one of the last N is green (Close > Open)."""
         # Last 3 in df_fail_green are [R, G, R] -> Fail
-        params = {'n_candles': 3}
+        params = {N_CANDLES_LENGTH: 3}
         result = self.indicator.evaluate(self.df_fail_green, params)
         self.assertEqual(result, 0, "Should return 0 due to a green candle breaking the sequence")
         
     def test_failure_due_to_doji_candle(self):
         """Test case where one of the last N is a doji (Close = Open)."""
         # Last 3 in df_fail_doji are [Doji, R, R] -> Fail
-        params = {'n_candles': 3}
+        params = {N_CANDLES_LENGTH: 3}
         result = self.indicator.evaluate(self.df_fail_doji, params)
         self.assertEqual(result, 0, "Should return 0 due to a doji candle breaking the sequence")
 
     def test_insufficient_data(self):
         """Test case where data length is less than N."""
         # Data has 2 rows, N is 3 -> Fail
-        params = {'n_candles': 3}
+        params = {N_CANDLES_LENGTH: 3}
         result = self.indicator.evaluate(self.df_short, params)
         self.assertEqual(result, 0, "Should return 0 when data length is less than n_candles")
 
     def test_custom_operation_signal(self):
         """Test case where n_candles_operation is set to 2 (Sell signal)."""
         # Condition is met (last 3 are red)
-        params = {'n_candles': 3, 'n_candles_operation': 2}
+        params = {N_CANDLES_LENGTH: 3, N_CANDLES_OPERATION: 2}
         result = self.indicator.evaluate(self.df_match, params)
         self.assertEqual(result, 2, "Should return 2 when n_candles_operation is 2")
 
     def test_missing_required_columns(self):
         """Test case for DataFrame missing 'Open' or 'Close'."""
-        params = {'n_candles': 1}
+        params = {N_CANDLES_LENGTH: 1}
         result = self.indicator.evaluate(self.df_bad_cols, params)
         self.assertEqual(result, 0, "Should return 0 when required columns are missing")
     

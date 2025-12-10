@@ -1,5 +1,16 @@
 import pandas_ta as ta
 import typing as t
+
+from indicators.constants import ( 
+    CLOSE_COLUMN,
+    RSI_BUY_THRESHOLD,
+    RSI_COLUMN,
+    RSI_LENGTH,
+    RSI_SELL_THRESHOLD,
+    SIGNAL_BUY,
+    SIGNAL_HOLD,
+    SIGNAL_SELL
+)
 from .indicator import Indicator
 
 class RSI(Indicator):
@@ -24,9 +35,9 @@ class RSI(Indicator):
         """
 
         default_config = {
-            'length': 10,
-            'buy_threshold': 30,
-            'sell_threshold': 70
+            RSI_LENGTH: 10,
+            RSI_BUY_THRESHOLD: 30,
+            RSI_SELL_THRESHOLD: 70
         }
         
         current_params = default_config.copy()
@@ -34,30 +45,30 @@ class RSI(Indicator):
             current_params.update(params)
 
         # Ensure 'Close' column exists before calculating RSI
-        if 'Close' not in data.columns:
+        if CLOSE_COLUMN not in data.columns:
             print("Error: DataFrame must contain a 'Close' column.")
             return 0
             
         # 1. Calculate RSI using parameters from the map
-        rsi_length = current_params.get('length', 14) # Default to 14 if not provided
-        data["RSI"] = ta.rsi(data.Close, length=rsi_length)
+        rsi_length = current_params.get(RSI_LENGTH, 14) # Default to 14 if not provided
+        data[RSI_COLUMN] = ta.rsi(data.Close, length=rsi_length)
         
         # Check if RSI calculation was successful (i.e., not all NaN)
-        if data["RSI"].empty or data["RSI"].iloc[-1] is None:
+        if data[RSI_COLUMN].empty or data[RSI_COLUMN].iloc[-1] is None:
             print("Not enough data for calculation or failure")
             return 0
 
         # 2. Extract thresholds and current RSI value
         current_rsi = data.RSI.iloc[-1]
-        buy_threshold = current_params.get('buy_threshold', 30)
-        sell_threshold = current_params.get('sell_threshold', 70)
+        buy_threshold = current_params.get(RSI_BUY_THRESHOLD, 30)
+        sell_threshold = current_params.get(RSI_SELL_THRESHOLD, 70)
         
-        output = 0
+        output = SIGNAL_HOLD
 
         # 3. Apply the trading logic
         if current_rsi <= buy_threshold:
-            output = 1  # Buy Signal
+            output = SIGNAL_BUY
         elif current_rsi >= sell_threshold:
-            output = 2  # Sell Signal
+            output = SIGNAL_SELL 
             
         return output

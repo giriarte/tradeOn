@@ -44,6 +44,9 @@ class TradeStrategy:
             # If no mandatory conditions exist, we can't meet the "all agree" requirement.
             return None 
 
+        if not params:
+            params = self.defaultParams
+
         # 2. Collect all signals from the base indicators
         signals = []
         for indicator in self.baseIndicators:

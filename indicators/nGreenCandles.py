@@ -2,6 +2,14 @@ import pandas as pd
 import typing as t
 from .indicator import Indicator
 from typing import Optional, Dict, Any
+from indicators.constants import ( 
+    CLOSE_COLUMN,
+    OPEN_COLUMN,
+    N_CANDLES_LENGTH,
+    N_CANDLES_OPERATION,
+    N_CANDLES_OFFSET,
+    SIGNAL_HOLD
+)
 
 class NGreenCandles(Indicator):
     """
@@ -26,24 +34,24 @@ class NGreenCandles(Indicator):
         """
         
         # --- 1. Parameter Validation ---
-        if params is None or 'n_candles' not in params:
-            raise ValueError("Parameters must be provided and contain the key 'n_candles'.")
+        if params is None or N_CANDLES_LENGTH not in params:
+            raise ValueError("Parameters must be provided and contain the key N_CANDLES_LENGTH.")
         
-        if params is None or 'n_candles_operation' not in params:
-            raise ValueError("Parameters must be provided and contain the key 'n_candles_operation'.")
+        if params is None or N_CANDLES_OPERATION not in params:
+            raise ValueError("Parameters must be provided and contain the key N_CANDLES_OPERATION.")
             
-        N = params['n_candles']
+        N = params[N_CANDLES_LENGTH]
         if not isinstance(N, int) or N <= 0:
-            raise ValueError("'n_candles' must be a positive integer.")
+            raise ValueError("N_CANDLES_LENGTH must be a positive integer.")
         
-        n_candles_operation = params['n_candles_operation']
+        n_candles_operation = params[N_CANDLES_OPERATION]
         if not isinstance(N, int) or 2 < N <= 0:
-            raise ValueError("'n_candles_operation' must be a 1 or 2.")
+            raise ValueError("N_CANDLES_OPERATION must be a 1 or 2.")
             
-        Y = params.get('n_candles_offset', 0)  # Offset (e.g., 0 for current, 2 for two periods ago)
+        Y = params.get(N_CANDLES_OFFSET, 0)  # Offset (e.g., 0 for current, 2 for two periods ago)
 
         # --- 2. Data Validation ---
-        required_cols = ['Open', 'Close']
+        required_cols = [OPEN_COLUMN, CLOSE_COLUMN]
         if not all(col in data.columns for col in required_cols):
             raise ValueError(f"DataFrame must contain the columns: {required_cols}")
             
@@ -67,12 +75,11 @@ class NGreenCandles(Indicator):
         # --- 4. Determine Candle Color ---
         # A candle is green (bullish) if Close > Open.
         # We create a boolean Series where True = Green Candle.
-        is_green_series = recent_data['Close'] > recent_data['Open']
+        is_green_series = recent_data[CLOSE_COLUMN] > recent_data[OPEN_COLUMN]
         
         # --- 5. Evaluate Condition ---
         # The condition is met if ALL values in the Series are True.
         is_all_green = is_green_series.all()
         
         # --- 6. Return Result ---
-        # Convert the boolean result (True/False) to the required integer (1/2).
-        return n_candles_operation if is_all_green else 0
+        return n_candles_operation if is_all_green else SIGNAL_HOLD

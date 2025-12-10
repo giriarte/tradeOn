@@ -1,6 +1,14 @@
 import typing as t
 import pandas as pd
 from .indicator import Indicator
+from indicators.constants import ( 
+    CLOSE_COLUMN,
+    OPEN_COLUMN,
+    N_CANDLES_LENGTH,
+    N_CANDLES_OPERATION,
+    N_CANDLES_OFFSET,
+    SIGNAL_HOLD
+)
 
 # Define the type alias for clarity
 IndicatorParams = t.Dict[str, t.Any]
@@ -30,20 +38,20 @@ class NRedCandles(Indicator):
         n_candles_operation = 1 # Default operation is to buy, but it can be changed by parameter to 2 (sell)
         N = default_n
         
-        if params and 'n_candles' in params:
-            N = params['n_candles']
+        if params and N_CANDLES_LENGTH in params:
+            N = params[N_CANDLES_LENGTH]
             
-        if params and 'n_candles_operation' in params:
-            n_candles_operation = params['n_candles_operation']
+        if params and N_CANDLES_OPERATION in params:
+            n_candles_operation = params[N_CANDLES_OPERATION]
         
-        Y = params.get('n_candles_offset', 0)  # Offset (e.g., 0 for current, 2 for two periods ago)
+        Y = params.get(N_CANDLES_OFFSET, 0)  # Offset (e.g., 0 for current, 2 for two periods ago)
 
         # 2. Data Validation
         if not isinstance(data, pd.DataFrame) or len(data) < N:
             # Not enough data or incorrect type, return Hold (0)
             return 0
         
-        if 'Open' not in data.columns or 'Close' not in data.columns:
+        if OPEN_COLUMN not in data.columns or CLOSE_COLUMN not in data.columns:
             print("Error: DataFrame must contain 'Open' and 'Close' columns.")
             return 0
         
@@ -64,7 +72,7 @@ class NRedCandles(Indicator):
         
         # A candle is "red" (bearish) if its Close price is less than its Open price.
         # We create a boolean Series where True = Red Candle.
-        is_red_series = recent_data['Close'] < recent_data['Open']
+        is_red_series = recent_data[CLOSE_COLUMN] < recent_data[OPEN_COLUMN]
         
         # Check if ALL N boolean values are True
         all_are_red = is_red_series.all()
@@ -75,4 +83,4 @@ class NRedCandles(Indicator):
             return n_candles_operation  # Signal
         else:
             # Condition not met
-            return 0  # Hold Signal
+            return SIGNAL_HOLD

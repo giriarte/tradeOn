@@ -14,6 +14,15 @@ from indicators.rsi import RSI
 from indicators.nRedCandles import NRedCandles
 from strategies.strategy import TradeStrategy
 from strategies.position import Position
+from indicators.constants import ( 
+    CLOSE_COLUMN,
+    OPEN_COLUMN,
+    N_CANDLES_LENGTH,
+    N_CANDLES_OPERATION,
+    RSI_LENGTH,
+    RSI_BUY_THRESHOLD,
+    RSI_SELL_THRESHOLD
+)
 
 def pointpos(x, xsignal):
     if x[xsignal]==2:
@@ -25,10 +34,10 @@ def pointpos(x, xsignal):
 
 def plot_with_signal(dfpl):
     fig = go.Figure(data=[go.Candlestick(x=dfpl.index,
-                    open=dfpl['Open'],
+                    open=dfpl[OPEN_COLUMN],
                     high=dfpl['High'],
                     low=dfpl['Low'],
-                    close=dfpl['Close'])])
+                    close=dfpl[CLOSE_COLUMN])])
 
     fig.update_layout(
         autosize=False,
@@ -49,11 +58,11 @@ def plotResults(data):
     plot_with_signal(data)
 
 strategy_config = {
-    'length': 10,
-    'buy_threshold': 30,
-    'sell_threshold': 70,
-    'n_candles': 3,
-    'n_candles_operation': 1
+    RSI_LENGTH: 10,
+    RSI_BUY_THRESHOLD: 30,
+    RSI_SELL_THRESHOLD: 70,
+    N_CANDLES_LENGTH: 3,
+    N_CANDLES_OPERATION: 1
 }
 
 should_plot = True
