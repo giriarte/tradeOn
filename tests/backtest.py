@@ -2,6 +2,7 @@
 from backtesting import Strategy, Backtest
 import yfinance as yf
 import sys
+import pandas as pd
 import os
 import numpy as np
 
@@ -12,9 +13,10 @@ if project_root not in sys.path:
 
 from strategies.built_in_strategies.threeGreenCandlesRsi import ThreeGreenCandlesRsi
 
+# raw_data = yf.download(tickers='BTC-USD', period='1y', interval='1d')
+# raw_data.columns = [col[0] for col in raw_data.columns]
 
-raw_data = yf.download(tickers='BTC-USD', period='1y', interval='1d')
-raw_data.columns = [col[0] for col in raw_data.columns]
+raw_data = []
 
 # To simulate 10x leverage (10% margin requirement)
 LEVERAGE = 10 
@@ -25,7 +27,7 @@ def STRATEGY():
 
     # Iterate through the data frame and append the strategy_output column
     strategy_output = [0]*len(raw_data)
-    for i in range(3,len(raw_data)):
+    for i in range(0,len(raw_data)):
         df = raw_data[0:i+1]
         strategy_position_output= test_strategy.evaluate(df)
         if (strategy_position_output):
@@ -34,26 +36,58 @@ def STRATEGY():
             strategy_output[i] = None
     return strategy_output
 
-class MyCandlesStrat(Strategy):  
+class BaseBacktestingStrat(Strategy):  
     def init(self):
         super().init()
         self.signal1 = self.I(STRATEGY)
         self.ratio = 1.5
-        self.risk_perc = 0.08
+        self.risk_perc = 0.004
 
     def next(self):
         super().next() 
         if self.signal1==1:
             sl1 = self.data.Close[-1] - self.data.Close[-1]*self.risk_perc
             tp1 = self.data.Close[-1] + (self.data.Close[-1]*self.risk_perc)*self.ratio
-            self.buy(size = 1, sl=sl1, tp=tp1)
+            self.buy(size = 100, sl=sl1, tp=tp1)
         elif self.signal1==2:
             sl1 = self.data.Close[-1] + self.data.Close[-1]*self.risk_perc
             tp1 = self.data.Close[-1] - (self.data.Close[-1]*self.risk_perc)*self.ratio
-            self.sell(size = 1, sl=sl1, tp=tp1)
-bt = Backtest(raw_data, MyCandlesStrat, cash=100000, commission=.02, margin=REQUIRED_MARGIN)
+            self.sell(size = 100, sl=sl1, tp=tp1)
 
-stat = bt.run()
+data_path = os.path.abspath('tests\historicalData1m')
+    
+if not os.path.isdir(data_path):
+    raise FileNotFoundError(f"Directory not found: {data_path}")
 
-print(stat)
-bt.plot()
+for filename in os.listdir(data_path):
+    # Check if the file ends with .csv
+    if filename.endswith('.csv'):
+        file_path = os.path.join(data_path, filename)
+        
+        print(f"Reading file: {filename}")
+
+
+
+        raw_data = pd.read_csv(file_path, index_col=0, parse_dates=True)
+        raw_data.index = pd.to_datetime(raw_data.index, format="%d.%m.%Y %H:%M:%S.%f %Z")
+        raw_data['Open'] = pd.to_numeric(raw_data['Open'], errors='coerce')
+        raw_data['Close'] = pd.to_numeric(raw_data['Close'], errors='coerce')
+        raw_data['High'] = pd.to_numeric(raw_data['High'], errors='coerce')
+        raw_data['Low'] = pd.to_numeric(raw_data['Low'], errors='coerce')
+    
+        # Drop rows where the values failed to convert (was a bad string)
+        raw_data.dropna(subset=['Open'], inplace=True)
+        raw_data.dropna(subset=['Close'], inplace=True)
+        raw_data.dropna(subset=['High'], inplace=True)
+        raw_data.dropna(subset=['Low'], inplace=True)
+
+        print(f"read {len(raw_data)} rows.")
+
+        # raw_data = yf.download(tickers='BTC-USD', period='1y', interval='1d')
+        # raw_data.columns = [col[0] for col in raw_data.columns]
+
+        bt = Backtest(raw_data, BaseBacktestingStrat, cash=100000, commission=.0002, margin=REQUIRED_MARGIN)
+        stat = bt.run()
+        print(stat)
+        print(stat._trades)
+        bt.plot()

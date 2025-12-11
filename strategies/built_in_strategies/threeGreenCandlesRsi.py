@@ -15,6 +15,13 @@ from strategies.strategy import TradeStrategy, Position
 Dictionary = t.Dict[str, t.Dict[str, t.Any]] # Represents the default parameters map
 
 class ThreeGreenCandlesRsi(TradeStrategy):
+    rsiLength = 10
+    rsiBuyThreshold = 30
+    rsiSellThreshold = 70
+    nCandlesLength = 3
+    nCandlesOperation = 2
+    nCandlesOffset = 1
+
     # --- ATTRIBUTES (Class Variables or Properties for definition) ---
     name: str = 'ThreeGreenCandlesRsi'
 
@@ -36,10 +43,10 @@ class ThreeGreenCandlesRsi(TradeStrategy):
     symbols: t.List[str] = ['BTC-USD'] # The coin pairs to which this strategy will apply
     candleInterval: str = '1d'  # Represents the data interval (e.g., 1 day)
     defaultParams: Dictionary = {
-        RSI_LENGTH: 10,
-        RSI_BUY_THRESHOLD: 30,
-        RSI_SELL_THRESHOLD: 70,
-        N_CANDLES_LENGTH: 3,
-        N_CANDLES_OPERATION: 2,
-        N_CANDLES_OFFSET: 1
+        RSI_LENGTH: rsiLength,
+        RSI_BUY_THRESHOLD: rsiBuyThreshold,
+        RSI_SELL_THRESHOLD: rsiSellThreshold,
+        N_CANDLES_LENGTH: nCandlesLength,
+        N_CANDLES_OPERATION: nCandlesOperation,
+        N_CANDLES_OFFSET: nCandlesOperation
     } # Inidicators parameters
