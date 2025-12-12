@@ -12,6 +12,7 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 from strategies.built_in_strategies.threeGreenCandlesRsi import ThreeGreenCandlesRsi
+from utils.positionUtils import getTradeSize
 
 # raw_data = yf.download(tickers='BTC-USD', period='1y', interval='1d')
 # raw_data.columns = [col[0] for col in raw_data.columns]
@@ -19,7 +20,7 @@ from strategies.built_in_strategies.threeGreenCandlesRsi import ThreeGreenCandle
 raw_data = []
 
 # To simulate 10x leverage (10% margin requirement)
-LEVERAGE = 10 
+LEVERAGE = 1
 REQUIRED_MARGIN = 1 / LEVERAGE
 
 lookback = 150  # Number of candles to look back for each evaluation
@@ -51,16 +52,17 @@ class BaseBacktestingStrat(Strategy):
 
     def next(self):
         super().next() 
+        tradeSize = getTradeSize(150000, self.data.Close[-1], LEVERAGE)
         if self.signal1==1:
             sl1 = self.data.Close[-1] - self.data.Close[-1]*self.risk_perc
             tp1 = self.data.Close[-1] + (self.data.Close[-1]*self.risk_perc)*self.ratio
-            self.buy(size = 3, sl=sl1, tp=tp1)
+            self.buy(size = tradeSize, sl=sl1, tp=tp1)
         elif self.signal1==2:
             sl1 = self.data.Close[-1] + self.data.Close[-1]*self.risk_perc
             tp1 = self.data.Close[-1] - (self.data.Close[-1]*self.risk_perc)*self.ratio
-            self.sell(size = 3, sl=sl1, tp=tp1)
+            self.sell(size = tradeSize, sl=sl1, tp=tp1)
 
-data_path = os.path.abspath('tests\\historicalData15m')
+data_path = os.path.abspath('tests\\temp')
     
 if not os.path.isdir(data_path):
     raise FileNotFoundError(f"Directory not found: {data_path}")
@@ -92,7 +94,7 @@ for filename in os.listdir(data_path):
         # raw_data = yf.download(tickers='BTC-USD', period='1y', interval='1d')
         # raw_data.columns = [col[0] for col in raw_data.columns]
 
-        bt = Backtest(raw_data, BaseBacktestingStrat, cash=1000000, commission=.0002, margin=REQUIRED_MARGIN)
+        bt = Backtest(raw_data, BaseBacktestingStrat, cash=10000000, commission=.0002, margin=REQUIRED_MARGIN)
         stat = bt.run()
         print(stat)
         print(stat._trades)
