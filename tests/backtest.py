@@ -22,13 +22,19 @@ raw_data = []
 LEVERAGE = 10 
 REQUIRED_MARGIN = 1 / LEVERAGE
 
+lookback = 150  # Number of candles to look back for each evaluation
+
 def STRATEGY():
     test_strategy = ThreeGreenCandlesRsi()
 
     # Iterate through the data frame and append the strategy_output column
     strategy_output = [0]*len(raw_data)
     for i in range(0,len(raw_data)):
-        df = raw_data[0:i+1]
+        start_index = max(0, i + 1 - lookback)
+        
+        # Slice the DataFrame to include data from start_index up to the current index i (inclusive).
+        # This will contain at most the last 'lookback' candles.
+        df = raw_data[start_index : i + 1]
         strategy_position_output= test_strategy.evaluate(df)
         if (strategy_position_output):
             strategy_output[i] = strategy_position_output.type
@@ -54,7 +60,7 @@ class BaseBacktestingStrat(Strategy):
             tp1 = self.data.Close[-1] - (self.data.Close[-1]*self.risk_perc)*self.ratio
             self.sell(size = 3, sl=sl1, tp=tp1)
 
-data_path = os.path.abspath('tests\\historicalData1h\\forex')
+data_path = os.path.abspath('tests\\historicalData15m')
     
 if not os.path.isdir(data_path):
     raise FileNotFoundError(f"Directory not found: {data_path}")
