@@ -62,7 +62,7 @@ def plotResults(data):
 # --- NEW: Main Logic Function ---
 # ====================================================================
 
-def main(event, context):
+def invoke(event, context):
     """
     Main execution function for the trading strategy simulation.
     """
@@ -119,10 +119,3 @@ def main(event, context):
     if should_plot:
         print("Plotting results...")
         plotResults(raw_data)
-
-# ====================================================================
-# --- Standard Python Entry Point ---
-# ====================================================================
-
-if __name__ == "__main__":
-    main('', '')

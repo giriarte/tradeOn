@@ -25,8 +25,9 @@ class TradeStrategy:
     categoryCPosition: Position # small reward ratio (more conservative position)
     
     # Market/Data Configuration
+    brokerId: str
     symbols: t.List[str] = [] # The coin pairs to which this strategy will apply
-    candleInterval: str  # Represents the data interval (e.g., 1 day)
+    candleInterval: str  # Represents the data interval (e.g., 1 day).
     defaultParams: Dictionary = {} # Inidicators parameters
 
     def evaluate(self, data: t.Any, params: t.Optional[Dictionary] = None) -> t.Optional[Position]:

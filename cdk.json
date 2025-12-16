@@ -1,0 +1,30 @@
+{
+  "app": "python app.py",
+  "watch": {
+    "include": [
+      "**"
+    ],
+    "exclude": [
+      "README.md",
+      "cdk*.json",
+      "requirements*.txt",
+      "source.list",
+      "package*.json",
+      "__pycache__",
+      "node_modules",
+      "cdk.out"
+    ]
+  },
+  "context": {
+    "@aws-cdk/aws-lambda:codeassetstagingbucket": true,
+    "@aws-cdk/core:newStyleStackSynthesis": true,
+    "@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId": true,
+    "@aws-cdk/aws-rds:lowercaseDbIdentifier": true,
+    "@aws-cdk/aws-lambda:recognizedRuntimeEnv": true,
+    "@aws-cdk/aws-lambda:legacyInlineCode": true,
+    "@aws-cdk/core:target-partitions": [
+      "aws",
+      "aws-cn"
+    ]
+  }
+}

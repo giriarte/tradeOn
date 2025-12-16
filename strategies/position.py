@@ -1,10 +1,14 @@
 
+from indicators.indicator import Indicator
+import typing as t
+
+
 class Position:
     type: int
     cost: float
     stopLoss: float
     takeProfit: float
-    # exitStrategy: Strategy | None TODO: This is a circular dependency. Figure out how to fix it
+    exitSignal: t.List[Indicator] | None
     trailingStopIncreaseRatio: float | None
     action: str = ''
     leverage: float
