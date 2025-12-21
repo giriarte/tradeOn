@@ -1,12 +1,22 @@
 import typing as t
 
+from indicators.InvertedHammer import InvertedHammer
+from indicators.bearishCandlePattern import BearishCandlePattern
+from indicators.bullishCandlePattern import BullishCandlePattern
 from indicators.doji import Doji
+from indicators.dragonFlyDoji import DragonflyDoji
+from indicators.engulfing import Engulfing
 from indicators.eveningStar import EveningStar
+from indicators.gravestoneDoji import GravestoneDoji
+from indicators.hammer import Hammer
+from indicators.hangingMan import HangingMan
+from indicators.harami import Harami
 from indicators.indicator import Indicator
 from indicators.morningStar import MorningStar
 from indicators.nGreenCandles import NGreenCandles
 from indicators.nRedCandles import NRedCandles
 from indicators.rsi import RSI
+from indicators.shootingStar import ShootingStar
 
 # --- Indicator Registry ---
 # Map the string name in DynamoDB to the class implementation
@@ -16,7 +26,17 @@ INDICATOR_MAP = {
     "RSI": RSI,
     "MorningStar": MorningStar,
     "EveningStar": EveningStar,
-    "Doji": Doji
+    "Doji": Doji,
+    "Engulfing": Engulfing,
+    "Harami": Harami,
+    "DragonflyDoji": DragonflyDoji,
+    "GravestoneDoji": GravestoneDoji,
+    "Hammer": Hammer,
+    "InvertedHammer": InvertedHammer,
+    "ShootingStar": ShootingStar,
+    "HangingMan": HangingMan,
+    "BullishCandlePattern": BullishCandlePattern,
+    "BearishCandlePattern": BearishCandlePattern
 }
 
 def get_indicator_instance(name: str, all_params: dict) -> Indicator:

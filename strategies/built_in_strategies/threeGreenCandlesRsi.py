@@ -1,4 +1,7 @@
 import typing as t
+from indicators.InvertedHammer import InvertedHammer
+from indicators.bearishCandlePattern import BearishCandlePattern
+from indicators.bullishCandlePattern import BullishCandlePattern
 from indicators.constants import (
     N_CANDLES_LENGTH,
     N_CANDLES_OFFSET,
@@ -9,11 +12,18 @@ from indicators.constants import (
     RSI_SELL_THRESHOLD
 )
 from indicators.doji import Doji
+from indicators.dragonFlyDoji import DragonflyDoji
+from indicators.engulfing import Engulfing
 from indicators.eveningStar import EveningStar
+from indicators.gravestoneDoji import GravestoneDoji
+from indicators.hammer import Hammer
+from indicators.hangingMan import HangingMan
+from indicators.harami import Harami
 from indicators.indicator import Indicator
 from indicators.morningStar import MorningStar
 from indicators.nGreenCandles import NGreenCandles
 from indicators.rsi import RSI
+from indicators.shootingStar import ShootingStar
 from strategies.strategy import TradeStrategy, Position
 
 Dictionary = t.Dict[str, t.Dict[str, t.Any]] # Represents the default parameters map
@@ -49,7 +59,7 @@ class ThreeGreenCandlesRsi(TradeStrategy):
     baseIndicators: t.List[Indicator] = [
         # NGreenCandles("NGreenCandles", defaultParams.get("NGreenCandles", {})),
         # RSI("RSI", defaultParams.get("RSI", {}))
-        Doji("Doji", defaultParams.get("Doji", {}))
+        BearishCandlePattern("BearishCandlePattern", defaultParams.get("BearishCandlePattern", {}))
     ] # Indicators here are mandatory conditions to generate a position
 
     enhancers: t.List[Indicator] = [] # Enhancers indicators can increase the position category
