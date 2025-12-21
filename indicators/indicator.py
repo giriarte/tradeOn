@@ -11,6 +11,10 @@ class Indicator(ABC):
     name: str = ""
     params: t.Dict[str, t.Any] = {}
 
+    def __init__(self, name: str, params: t.Dict[str, t.Any] = None):
+        self.name = name
+        self.params = params if params is not None else {}
+
     # --- ABSTRACT METHOD ---
 
     @abstractmethod

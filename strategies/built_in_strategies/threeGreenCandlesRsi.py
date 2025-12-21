@@ -2,12 +2,16 @@ import typing as t
 from indicators.constants import (
     N_CANDLES_LENGTH,
     N_CANDLES_OFFSET,
-    N_CANDLES_OPERATION, 
+    N_CANDLES_OPERATION,
+    OPERATION_TYPE, 
     RSI_BUY_THRESHOLD, 
     RSI_LENGTH, 
     RSI_SELL_THRESHOLD
 )
+from indicators.doji import Doji
+from indicators.eveningStar import EveningStar
 from indicators.indicator import Indicator
+from indicators.morningStar import MorningStar
 from indicators.nGreenCandles import NGreenCandles
 from indicators.rsi import RSI
 from strategies.strategy import TradeStrategy, Position
@@ -25,10 +29,27 @@ class ThreeGreenCandlesRsi(TradeStrategy):
     # --- ATTRIBUTES (Class Variables or Properties for definition) ---
     name: str = 'ThreeGreenCandlesRsi'
 
+    defaultParams: Dictionary = {
+        "RSI": {
+                RSI_LENGTH: rsiLength,
+                RSI_BUY_THRESHOLD: rsiBuyThreshold,
+                RSI_SELL_THRESHOLD: rsiSellThreshold
+            },
+        "NGreenCandles": {
+            N_CANDLES_LENGTH: nCandlesLength,
+            N_CANDLES_OPERATION: nCandlesOperation,
+            N_CANDLES_OFFSET: nCandlesOffset
+        },
+        "Doji": {
+            OPERATION_TYPE: 2
+        }
+    } # Inidicators parameters
+
     # Lists of Indicators
     baseIndicators: t.List[Indicator] = [
-        NGreenCandles(),
-        RSI()
+        # NGreenCandles("NGreenCandles", defaultParams.get("NGreenCandles", {})),
+        # RSI("RSI", defaultParams.get("RSI", {}))
+        Doji("Doji", defaultParams.get("Doji", {}))
     ] # Indicators here are mandatory conditions to generate a position
 
     enhancers: t.List[Indicator] = [] # Enhancers indicators can increase the position category
@@ -42,11 +63,4 @@ class ThreeGreenCandlesRsi(TradeStrategy):
     # Market/Data Configuration
     symbols: t.List[str] = ['BTC-USD'] # The coin pairs to which this strategy will apply
     candleInterval: str = '1d'  # Represents the data interval (e.g., 1 day)
-    defaultParams: Dictionary = {
-        RSI_LENGTH: rsiLength,
-        RSI_BUY_THRESHOLD: rsiBuyThreshold,
-        RSI_SELL_THRESHOLD: rsiSellThreshold,
-        N_CANDLES_LENGTH: nCandlesLength,
-        N_CANDLES_OPERATION: nCandlesOperation,
-        N_CANDLES_OFFSET: nCandlesOperation
-    } # Inidicators parameters
+

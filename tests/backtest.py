@@ -23,19 +23,19 @@ raw_data = []
 LEVERAGE = 1
 REQUIRED_MARGIN = 1 / LEVERAGE
 
-lookback = 150  # Number of candles to look back for each evaluation
-
 def STRATEGY():
-    test_strategy = ThreeGreenCandlesRsi()
+    test_strategy = ThreeGreenCandlesRsi("ThreeGreenCandlesRsi",
+                                         ThreeGreenCandlesRsi.baseIndicators,
+                                         ThreeGreenCandlesRsi.categoryAPosition,
+                                         brokerId="test_broker",
+                                         symbols=ThreeGreenCandlesRsi.symbols,
+                                         candleInterval=ThreeGreenCandlesRsi.candleInterval,
+                                         defaultParams=ThreeGreenCandlesRsi.defaultParams)
 
     # Iterate through the data frame and append the strategy_output column
     strategy_output = [0]*len(raw_data)
     for i in range(0,len(raw_data)):
-        start_index = max(0, i + 1 - lookback)
-        
-        # Slice the DataFrame to include data from start_index up to the current index i (inclusive).
-        # This will contain at most the last 'lookback' candles.
-        df = raw_data[start_index : i + 1]
+        df = raw_data[0 : i + 1]
         strategy_position_output= test_strategy.evaluate(df)
         if (strategy_position_output):
             strategy_output[i] = strategy_position_output.type
@@ -62,7 +62,7 @@ class BaseBacktestingStrat(Strategy):
             tp1 = self.data.Close[-1] - (self.data.Close[-1]*self.risk_perc)*self.ratio
             self.sell(size = tradeSize, sl=sl1, tp=tp1)
 
-data_path = os.path.abspath('tests\\temp')
+data_path = os.path.abspath('tests\\historicalData1h\\crypto')
     
 if not os.path.isdir(data_path):
     raise FileNotFoundError(f"Directory not found: {data_path}")
@@ -93,6 +93,9 @@ for filename in os.listdir(data_path):
 
         # raw_data = yf.download(tickers='BTC-USD', period='1y', interval='1d')
         # raw_data.columns = [col[0] for col in raw_data.columns]
+    
+        # Uncomment this line to visualize the results properly. Plot library will not produce expected results for more than 10000 rows.
+        raw_data = raw_data[0 : 10000]
 
         bt = Backtest(raw_data, BaseBacktestingStrat, cash=10000000, commission=.0002, margin=REQUIRED_MARGIN)
         stat = bt.run()

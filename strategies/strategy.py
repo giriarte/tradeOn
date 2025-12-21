@@ -6,6 +6,23 @@ from .position import Position
 Dictionary = t.Dict[str, t.Dict[str, t.Any]] # Represents the default parameters map
 
 class TradeStrategy:
+
+    def __init__(self, 
+                  name: str,
+                  baseIndicators: t.List[Indicator],
+                  categoryAPosition: Position,
+                  brokerId: str,
+                  symbols: t.List[str],
+                  candleInterval: str,
+                  defaultParams: Dictionary = None):
+        self.name = name
+        self.baseIndicators = baseIndicators
+        self.categoryAPosition = categoryAPosition
+        self.brokerId = brokerId
+        self.symbols = symbols
+        self.candleInterval = candleInterval
+        self.defaultParams = defaultParams if defaultParams is not None else {}
+
     """
     Interface for a trading strategy, defining the required attributes and methods
     to be implemented by any concrete strategy (strategies can be formed by one or more indicators).
@@ -44,9 +61,6 @@ class TradeStrategy:
         if not self.baseIndicators:
             # If no mandatory conditions exist, we can't meet the "all agree" requirement.
             return None 
-
-        if not params:
-            params = self.defaultParams
 
         # 2. Collect all signals from the base indicators
         signals = []

@@ -34,15 +34,10 @@ class RSI(Indicator):
             int: 0 (Hold/Neutral), 1 (Buy), or 2 (Sell).
         """
 
-        default_config = {
-            RSI_LENGTH: 10,
-            RSI_BUY_THRESHOLD: 30,
-            RSI_SELL_THRESHOLD: 70
-        }
-        
-        current_params = default_config.copy()
-        if params:
-            current_params.update(params)
+        # Use instance parameters if none are provided
+        current_params = params
+        if (current_params is None):
+            current_params = self.params
 
         # Ensure 'Close' column exists before calculating RSI
         if CLOSE_COLUMN not in data.columns:

@@ -3,6 +3,18 @@ import sys
 import os
 import plotly.graph_objects as go
 import numpy as np
+import boto3
+from botocore.exceptions import ClientError
+from boto3.dynamodb.conditions import Key
+import typing as t
+from strategies.StrategyBuilder import create_strategy
+
+dynamodb = boto3.resource('dynamodb')
+users_table = dynamodb.Table('Users')
+strategies_table = dynamodb.Table('Strategies')
+# Initialize the SNS client
+sns_client = boto3.client('sns', region_name='us-east-1')
+TOPIC_ARN = "arn:aws:sns:us-east-1:542557037063:TradeNotification"
 
 # --- System Path Setup (Keep as is) ---
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -62,60 +74,134 @@ def plotResults(data):
 # --- NEW: Main Logic Function ---
 # ====================================================================
 
-def invoke(event, context):
-    """
-    Main execution function for the trading strategy simulation.
-    """
-    # 1. Configuration
-    strategy_config = {
-        RSI_LENGTH: 10,
-        RSI_BUY_THRESHOLD: 30,
-        RSI_SELL_THRESHOLD: 70,
-        N_CANDLES_LENGTH: 3,
-        N_CANDLES_OPERATION: 1
-    }
+should_plot = True
 
-    should_plot = True
-    
-    # 2. Data Download and Cleanup
+def invoke(event, context):
+    # 1. Extract identifiers from the payload
+    email = event.get('email')
+    user_id = event.get('userId')
+    testMode = event.get('testMode')
+
+    # Data Download and Cleanup
     print("Downloading data...")
     raw_data = yf.download(tickers='BTC-USD', period='1y', interval='1d')
     # Clean up column names (e.g., ('Close', '') -> 'Close')
     raw_data.columns = [col[0] if isinstance(col, tuple) else col for col in raw_data.columns]
-    
-    # 3. Instantiate the Indicators and Strategy
-    print("Instantiating strategy components...")
-    rsi_indicator = RSI()
-    nRedCandles_indicator = NRedCandles()
 
-    rsi_3RedCandles_strategy = TradeStrategy()
-    rsi_3RedCandles_strategy.baseIndicators = [nRedCandles_indicator, rsi_indicator]
-    rsi_3RedCandles_strategy.categoryAPosition = Position()
+    if not email or not user_id:
+        return {"statusCode": 400, "body": "Missing email or userId in payload"}
 
-    # 4. Strategy Iteration and Execution
-    print("Executing backtest...")
-    strategy_output = [0] * len(raw_data)
-    
-    # Start iteration after the period needed for initial indicators (e.g., 3 days)
-    # The actual start should probably be based on the max length of your indicators.
-    start_index = max(3, strategy_config.get(RSI_LENGTH, 10)) # Use max indicator length
-    
-    for i in range(start_index, len(raw_data)):
-        # Pass the data up to the current bar (i+1 to include current bar)
-        df = raw_data.iloc[0:i+1] 
-        
-        strategy_position_output = rsi_3RedCandles_strategy.evaluate(df, strategy_config)
+    user_details = getUserDetails(email, user_id)
+
+    user_strategies = getUserStrategies(email, user_id)
+
+    # --- Transform to Objects ---
+    trade_strategies: t.List[TradeStrategy] = []
+
+    for item in user_strategies:
+        try:
+            strategy_obj = create_strategy(item)
+            trade_strategies.append(strategy_obj)
+        except Exception as hydration_error:
+            print(f"Failed to hydrate strategy {item.get('name')}: {hydration_error}")
+            # Continue to next strategy even if one fails
+            continue
+
+    if testMode:
+        print("Running in test mode...")
+        doTestMode(raw_data, trade_strategies)
+        return {"statusCode": 200, "body": "Test mode execution complete."}
+
+    # Real flow, in case testMode is not active...
+    for strategy in trade_strategies:
+        # raw_data[0:141] is to force generate a signal. Replace it with raw_data for full dataset
+        strategy_position_output = strategy.evaluate(raw_data[0:141], None)
         
         if strategy_position_output:
-            # Store the type (e.g., 1 for Buy, 2 for Sell)
-            strategy_output[i] = strategy_position_output.type
-        else:
-            strategy_output[i] = 0 # Use 0 instead of None for easier plotting/analysis
+            alert_message = f"Strategy {strategy.name} generated a signal: {strategy_position_output.type}"
+            print(alert_message)
             
-    raw_data["strategy_output"] = strategy_output
-    print("Backtest complete.")
+            try:
+                # Publish to the SNS Topic
+                response = sns_client.publish(
+                    TopicArn=TOPIC_ARN,
+                    Message=alert_message,
+                    Subject=f"Trading Alert: {strategy.name}"
+                )
+                print(f"Notification sent! Message ID: {response['MessageId']}")
+                
+            except ClientError as e:
+                print(f"Failed to send notification: {e.response['Error']['Message']}")
 
-    # 5. Plotting Results
-    if should_plot:
-        print("Plotting results...")
-        plotResults(raw_data)
+        else:
+            print(f"Strategy {strategy.name} did not generate any signal.")
+
+
+def doTestMode(raw_data, trade_strategies):
+    for strategy in trade_strategies:
+        strategy_output = [0] * len(raw_data)
+        for i in range(0, len(raw_data)):
+            # Pass the data up to the current bar
+            df = raw_data.iloc[0:i] 
+            
+            strategy_position_output = strategy.evaluate(df, None)
+            
+            if strategy_position_output:
+                # Store the type (e.g., 1 for Buy, 2 for Sell)
+                strategy_output[i] = strategy_position_output.type
+                print(f"Index {i}: Strategy {strategy.name} generated signal {strategy_position_output.type}")
+            else:
+                strategy_output[i] = 0 # Use 0 instead of None for easier plotting/analysis
+                
+        raw_data["strategy_output"] = strategy_output
+        print("Single stratey test complete.")
+
+        # 5. Plotting Results
+        if should_plot:
+            print("Plotting results...")
+            plotResults(raw_data)
+        print(raw_data)
+
+
+
+def getUserStrategies(email, user_id):
+    try:
+        strategies_response = strategies_table.query(
+            KeyConditionExpression=Key('userId').eq(user_id)
+        )
+        strategies_list = strategies_response.get('Items', [])
+
+        # Business logic goes here
+        print(f"Fetched {len(strategies_list)} strategies for user {email}")
+
+        return strategies_list
+    except Exception as e:
+        print(f"Error accessing DynamoDB: {str(e)}")
+        return {"statusCode": 500, "body": "Internal Server Error"}
+
+def getUserDetails(email, user_id):
+    try:
+        user_response = users_table.get_item(
+            Key={
+                'email': email,
+                'userId': user_id
+            }
+        )
+        user_details = user_response.get('Item') # This is your UserDetails object
+        
+        if not user_details:
+            return {"statusCode": 404, "body": "User not found"}
+        
+        return user_details
+    except Exception as e:
+        print(f"Error accessing DynamoDB: {str(e)}")
+        return {"statusCode": 500, "body": "Internal Server Error"}
+
+
+user_payload = {
+    "email": "a.g.iriarte@gmail.com",
+    "userId": "12345",
+    "testMode": True
+}
+
+invoke(user_payload, None)
