@@ -32,6 +32,10 @@ class NRedCandles(Indicator):
             int: 1 (Buy signal) or 0 (Hold/Neutral).
         """
         
+        # Use instance parameters if none are provided
+        if (params is None):
+            params = self.params
+
         # 1. Parameter Handling (N)
         default_n = 3 # Default lookback if not provided
 
