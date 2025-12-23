@@ -48,42 +48,74 @@ def pointpos(x, xsignal):
         return np.nan
 
 def plot_with_signal(dfpl):
-    # 1. Calculate EMA 20 for visual confirmation
-    # Ensure EMA is calculated on the dataframe slice passed to the function
+    # 1. Setup Data
     dfpl = dfpl.copy()
+    
+    # Calculate EMAs (as per your snippet)
     dfpl['EMA_9'] = ta.ema(dfpl[CLOSE_COLUMN], length=15)
     dfpl['EMA_21'] = ta.ema(dfpl[CLOSE_COLUMN], length=50)
+    
+    # Calculate Bollinger Bands (Length 20, Std Dev 2)
+    bb_length = 20
+    bb_std = 2.0
+    bb = ta.bbands(dfpl[CLOSE_COLUMN], length=bb_length, std=bb_std)
+    
+    # Extract BB columns (naming convention: BBL_length_std)
+    dfpl['BBL'] = bb[f'BBL_{bb_length}_{bb_std}_{bb_std}']
+    dfpl['BBM'] = bb[f'BBM_{bb_length}_{bb_std}_{bb_std}']
+    dfpl['BBU'] = bb[f'BBU_{bb_length}_{bb_std}_{bb_std}']
 
-    fig = go.Figure(data=[go.Candlestick(x=dfpl.index,
-                                         open=dfpl[OPEN_COLUMN],
-                                         high=dfpl['High'],
-                                         low=dfpl['Low'],
-                                         close=dfpl[CLOSE_COLUMN],
-                                         name="Candlesticks")])
+    fig = go.Figure()
 
-    # 2. Add the EMA Line
+    # 2. Add Bollinger Bands (Adding these first so they sit behind candlesticks)
+    # Upper Band
     fig.add_trace(go.Scatter(
-        x=dfpl.index, 
-        y=dfpl['EMA_21'], 
+        x=dfpl.index, y=dfpl['BBU'],
+        line=dict(color='rgba(173, 216, 230, 0.4)', width=1),
+        name="BB Upper"
+    ))
+
+    # Lower Band with Fill
+    fig.add_trace(go.Scatter(
+        x=dfpl.index, y=dfpl['BBL'],
+        line=dict(color='rgba(173, 216, 230, 0.4)', width=1),
+        fill='tonexty', # Fills the area between BBU and BBL
+        fillcolor='rgba(173, 216, 230, 0.1)', 
+        name="BB Lower"
+    ))
+
+    # 3. Add Candlesticks
+    fig.add_trace(go.Candlestick(
+        x=dfpl.index,
+        open=dfpl[OPEN_COLUMN],
+        high=dfpl['High'],
+        low=dfpl['Low'],
+        close=dfpl[CLOSE_COLUMN],
+        name="Candlesticks"
+    ))
+
+    # 4. Add the EMA Lines
+    fig.add_trace(go.Scatter(
+        x=dfpl.index, y=dfpl['EMA_21'], 
         line=dict(color='yellow', width=1.5), 
         name="EMA 21"
     ))
 
     fig.add_trace(go.Scatter(
-        x=dfpl.index, 
-        y=dfpl['EMA_9'], 
+        x=dfpl.index, y=dfpl['EMA_9'], 
         line=dict(color='orange', width=1.5), 
         name="EMA 9"
     ))
 
-    # 3. Add the Signals
-    fig.add_scatter(x=dfpl.index, 
-                    y=dfpl['pointpos'], 
-                    mode="markers",
-                    marker=dict(size=8, color="MediumPurple"),
-                    name="Signal")
+    # 5. Add the Signals (Markers)
+    fig.add_scatter(
+        x=dfpl.index, y=dfpl['pointpos'], 
+        mode="markers",
+        marker=dict(size=10, color="MediumPurple", symbol="diamond"),
+        name="Signal"
+    )
 
-    # Layout styling
+    # 6. Layout styling
     fig.update_layout(
         autosize=False,
         width=1200,

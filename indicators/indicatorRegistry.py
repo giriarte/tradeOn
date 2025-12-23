@@ -2,6 +2,7 @@ import typing as t
 
 from indicators.InvertedHammer import InvertedHammer
 from indicators.bearishCandlePattern import BearishCandlePattern
+from indicators.bollingerBandReEntry import BollingerBandReEntry
 from indicators.bullishCandlePattern import BullishCandlePattern
 from indicators.doji import Doji
 from indicators.dragonFlyDoji import DragonflyDoji
@@ -42,7 +43,8 @@ INDICATOR_MAP = {
     "BearishCandlePattern": BearishCandlePattern,
     "EMADistanceCap": EMADistanceCap,
     "EMASlope": EMASlope,
-    "EMACross": EMACross
+    "EMACross": EMACross,
+    "BollingerBandReEntry": BollingerBandReEntry
 }
 
 def get_indicator_instance(name: str, all_params: dict) -> Indicator:

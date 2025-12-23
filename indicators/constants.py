@@ -23,6 +23,8 @@ DISTANCE_PCT_CAP = 'distance_pct_cap'
 MIN_SLOPE_PCT = 'min_slope_pct'
 EMA_HIGH = 'ema_high'
 EMA_LOW = 'ema_low'
+BB_LENGTH = 'bb_length'
+BB_STD = 'bb_std'
 
 # General Constants
 OPERATION_TYPE = 'operation_type'
