@@ -17,7 +17,16 @@ N_CANDLES_LENGTH = 'n_candles_length'
 N_CANDLES_OPERATION = 'n_candles_operation'
 N_CANDLES_OFFSET = 'n_candles_offset'
 
+# EMA Keys
+EMA_LENGTH = 'ema_length'
+DISTANCE_PCT_CAP = 'distance_pct_cap'
+MIN_SLOPE_PCT = 'min_slope_pct'
+EMA_HIGH = 'ema_high'
+EMA_LOW = 'ema_low'
+
+# General Constants
 OPERATION_TYPE = 'operation_type'
+LOOKBACK = 'lookback'
 
 # Indicators column names
 CLOSE_COLUMN = 'Close'

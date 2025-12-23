@@ -7,6 +7,7 @@ import boto3
 from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key
 import typing as t
+import pandas_ta as ta
 from strategies.StrategyBuilder import create_strategy
 
 dynamodb = boto3.resource('dynamodb')
@@ -47,23 +48,54 @@ def pointpos(x, xsignal):
         return np.nan
 
 def plot_with_signal(dfpl):
-    fig = go.Figure(data=[go.Candlestick(x=dfpl.index,
-                                     open=dfpl[OPEN_COLUMN],
-                                     high=dfpl['High'],
-                                     low=dfpl['Low'],
-                                     close=dfpl[CLOSE_COLUMN])])
+    # 1. Calculate EMA 20 for visual confirmation
+    # Ensure EMA is calculated on the dataframe slice passed to the function
+    dfpl = dfpl.copy()
+    dfpl['EMA_9'] = ta.ema(dfpl[CLOSE_COLUMN], length=15)
+    dfpl['EMA_21'] = ta.ema(dfpl[CLOSE_COLUMN], length=50)
 
-    fig.update_layout(
-        autosize=False,
-        width=1000,
-        height=800, 
-        paper_bgcolor='black',
-        plot_bgcolor='black')
-    fig.update_xaxes(gridcolor='black')
-    fig.update_yaxes(gridcolor='black')
-    fig.add_scatter(x=dfpl.index, y=dfpl['pointpos'], mode="markers",
+    fig = go.Figure(data=[go.Candlestick(x=dfpl.index,
+                                         open=dfpl[OPEN_COLUMN],
+                                         high=dfpl['High'],
+                                         low=dfpl['Low'],
+                                         close=dfpl[CLOSE_COLUMN],
+                                         name="Candlesticks")])
+
+    # 2. Add the EMA Line
+    fig.add_trace(go.Scatter(
+        x=dfpl.index, 
+        y=dfpl['EMA_21'], 
+        line=dict(color='yellow', width=1.5), 
+        name="EMA 21"
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=dfpl.index, 
+        y=dfpl['EMA_9'], 
+        line=dict(color='orange', width=1.5), 
+        name="EMA 9"
+    ))
+
+    # 3. Add the Signals
+    fig.add_scatter(x=dfpl.index, 
+                    y=dfpl['pointpos'], 
+                    mode="markers",
                     marker=dict(size=8, color="MediumPurple"),
                     name="Signal")
+
+    # Layout styling
+    fig.update_layout(
+        autosize=False,
+        width=1200,
+        height=800, 
+        paper_bgcolor='black',
+        plot_bgcolor='black',
+        legend=dict(font=dict(color="white"))
+    )
+    
+    fig.update_xaxes(gridcolor='#333333', zeroline=False)
+    fig.update_yaxes(gridcolor='#333333', zeroline=False)
+    
     fig.show()
 
 def plotResults(data):

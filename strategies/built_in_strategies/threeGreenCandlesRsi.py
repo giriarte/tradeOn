@@ -3,6 +3,8 @@ from indicators.InvertedHammer import InvertedHammer
 from indicators.bearishCandlePattern import BearishCandlePattern
 from indicators.bullishCandlePattern import BullishCandlePattern
 from indicators.constants import (
+    DISTANCE_PCT_CAP,
+    EMA_LENGTH,
     N_CANDLES_LENGTH,
     N_CANDLES_OFFSET,
     N_CANDLES_OPERATION,
@@ -13,6 +15,9 @@ from indicators.constants import (
 )
 from indicators.doji import Doji
 from indicators.dragonFlyDoji import DragonflyDoji
+from indicators.emaCross import EMACross
+from indicators.emaDistanceCap import EMADistanceCap
+from indicators.emaSlope import EMASlope
 from indicators.engulfing import Engulfing
 from indicators.eveningStar import EveningStar
 from indicators.gravestoneDoji import GravestoneDoji
@@ -52,6 +57,10 @@ class ThreeGreenCandlesRsi(TradeStrategy):
         },
         "Doji": {
             OPERATION_TYPE: 2
+        },
+        "EMADistanceCap": {
+            EMA_LENGTH: 50,
+            DISTANCE_PCT_CAP: 0.05
         }
     } # Inidicators parameters
 
@@ -59,7 +68,7 @@ class ThreeGreenCandlesRsi(TradeStrategy):
     baseIndicators: t.List[Indicator] = [
         # NGreenCandles("NGreenCandles", defaultParams.get("NGreenCandles", {})),
         # RSI("RSI", defaultParams.get("RSI", {}))
-        BearishCandlePattern("BearishCandlePattern", defaultParams.get("BearishCandlePattern", {}))
+        EMACross("EMACross", defaultParams.get("EMACross", {}))
     ] # Indicators here are mandatory conditions to generate a position
 
     enhancers: t.List[Indicator] = [] # Enhancers indicators can increase the position category

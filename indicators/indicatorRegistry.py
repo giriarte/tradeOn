@@ -5,6 +5,9 @@ from indicators.bearishCandlePattern import BearishCandlePattern
 from indicators.bullishCandlePattern import BullishCandlePattern
 from indicators.doji import Doji
 from indicators.dragonFlyDoji import DragonflyDoji
+from indicators.emaCross import EMACross
+from indicators.emaDistanceCap import EMADistanceCap
+from indicators.emaSlope import EMASlope
 from indicators.engulfing import Engulfing
 from indicators.eveningStar import EveningStar
 from indicators.gravestoneDoji import GravestoneDoji
@@ -36,7 +39,10 @@ INDICATOR_MAP = {
     "ShootingStar": ShootingStar,
     "HangingMan": HangingMan,
     "BullishCandlePattern": BullishCandlePattern,
-    "BearishCandlePattern": BearishCandlePattern
+    "BearishCandlePattern": BearishCandlePattern,
+    "EMADistanceCap": EMADistanceCap,
+    "EMASlope": EMASlope,
+    "EMACross": EMACross
 }
 
 def get_indicator_instance(name: str, all_params: dict) -> Indicator:
