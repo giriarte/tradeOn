@@ -4,6 +4,7 @@ from indicators.bearishCandlePattern import BearishCandlePattern
 from indicators.bollingerBandReEntry import BollingerBandReEntry
 from indicators.bollingerBandWidth import BollingerBandWidth
 from indicators.bullishCandlePattern import BullishCandlePattern
+from indicators.closePrice import ClosePrice
 from indicators.constants import (
     DISTANCE_PCT_CAP,
     EMA_LENGTH,
@@ -85,7 +86,7 @@ class ThreeGreenCandlesRsi(TradeStrategy):
     baseIndicators: t.List[Indicator] = [
         # NGreenCandles("NGreenCandles", defaultParams.get("NGreenCandles", {})),
         # RSI("RSI", defaultParams.get("RSI", {}))
-        NearEMA("NearEMA", defaultParams.get("NearEMA", {}))
+        ClosePrice("ClosePrice", defaultParams.get("ClosePrice", {}))
     ] # Indicators here are mandatory conditions to generate a position
 
     enhancers: t.List[Indicator] = [] # Enhancers indicators can increase the position category

@@ -5,6 +5,7 @@ from indicators.bearishCandlePattern import BearishCandlePattern
 from indicators.bollingerBandReEntry import BollingerBandReEntry
 from indicators.bollingerBandWidth import BollingerBandWidth
 from indicators.bullishCandlePattern import BullishCandlePattern
+from indicators.closePrice import ClosePrice
 from indicators.doji import Doji
 from indicators.dragonFlyDoji import DragonflyDoji
 from indicators.emaCross import EMACross
@@ -56,7 +57,8 @@ INDICATOR_MAP = {
     "PriceAboveBollingerBand": PriceAboveBollingerBand,
     "NearSupport": NearSupport,
     "NearEMA": NearEMA,
-    "NearResistance": NearResistance
+    "NearResistance": NearResistance,
+    "ClosePrice": ClosePrice
 }
 
 def get_indicator_instance(name: str, all_params: dict) -> Indicator:
