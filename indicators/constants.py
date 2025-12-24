@@ -23,8 +23,12 @@ DISTANCE_PCT_CAP = 'distance_pct_cap'
 MIN_SLOPE_PCT = 'min_slope_pct'
 EMA_HIGH = 'ema_high'
 EMA_LOW = 'ema_low'
+
+# Bollinger Bands keys
 BB_LENGTH = 'bb_length'
 BB_STD = 'bb_std'
+BB_VARIATION_MIN = 'bb_variation_min'
+BB_VARIATION_MAX = 'bb_variation_max'
 
 # General Constants
 OPERATION_TYPE = 'operation_type'

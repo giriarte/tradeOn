@@ -3,6 +3,7 @@ import typing as t
 from indicators.InvertedHammer import InvertedHammer
 from indicators.bearishCandlePattern import BearishCandlePattern
 from indicators.bollingerBandReEntry import BollingerBandReEntry
+from indicators.bollingerBandWidth import BollingerBandWidth
 from indicators.bullishCandlePattern import BullishCandlePattern
 from indicators.doji import Doji
 from indicators.dragonFlyDoji import DragonflyDoji
@@ -19,6 +20,8 @@ from indicators.indicator import Indicator
 from indicators.morningStar import MorningStar
 from indicators.nGreenCandles import NGreenCandles
 from indicators.nRedCandles import NRedCandles
+from indicators.priceAboveBollingerBand import PriceAboveBollingerBand
+from indicators.priceBelowBolingerBand import PriceBelowBollingerBand
 from indicators.rsi import RSI
 from indicators.shootingStar import ShootingStar
 
@@ -44,7 +47,10 @@ INDICATOR_MAP = {
     "EMADistanceCap": EMADistanceCap,
     "EMASlope": EMASlope,
     "EMACross": EMACross,
-    "BollingerBandReEntry": BollingerBandReEntry
+    "BollingerBandReEntry": BollingerBandReEntry,
+    "BollingerBandWidth": BollingerBandWidth,
+    "PriceBelowBollingerBand": PriceBelowBollingerBand,
+    "PriceAboveBollingerBand": PriceAboveBollingerBand
 }
 
 def get_indicator_instance(name: str, all_params: dict) -> Indicator:

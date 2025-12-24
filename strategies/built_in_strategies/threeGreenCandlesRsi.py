@@ -2,6 +2,7 @@ import typing as t
 from indicators.InvertedHammer import InvertedHammer
 from indicators.bearishCandlePattern import BearishCandlePattern
 from indicators.bollingerBandReEntry import BollingerBandReEntry
+from indicators.bollingerBandWidth import BollingerBandWidth
 from indicators.bullishCandlePattern import BullishCandlePattern
 from indicators.constants import (
     DISTANCE_PCT_CAP,
@@ -62,6 +63,9 @@ class ThreeGreenCandlesRsi(TradeStrategy):
         "EMADistanceCap": {
             EMA_LENGTH: 50,
             DISTANCE_PCT_CAP: 0.05
+        },
+        "BollingerBandWidth": {
+            "bb_variation_min": 7.0
         }
     } # Inidicators parameters
 
@@ -69,7 +73,7 @@ class ThreeGreenCandlesRsi(TradeStrategy):
     baseIndicators: t.List[Indicator] = [
         # NGreenCandles("NGreenCandles", defaultParams.get("NGreenCandles", {})),
         # RSI("RSI", defaultParams.get("RSI", {}))
-        BollingerBandReEntry("BollingerBandReEntry", defaultParams.get("BollingerBandReEntry", {}))
+        BollingerBandWidth("BollingerBandWidth", defaultParams.get("BollingerBandWidth", {}))
     ] # Indicators here are mandatory conditions to generate a position
 
     enhancers: t.List[Indicator] = [] # Enhancers indicators can increase the position category
