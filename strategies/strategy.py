@@ -82,7 +82,7 @@ class TradeStrategy:
             
             if agreed_signal != 0:
                 # All mandatory conditions are met and agree on a trade (Buy/Sell)
-                self.categoryAPosition.type = agreed_signal
+                self.categoryAPosition.type = int(agreed_signal)
                 return self.categoryAPosition
         
         # 4. If signals conflict, or if the agreed signal is 0 (Hold), return None

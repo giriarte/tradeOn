@@ -20,6 +20,9 @@ from indicators.indicator import Indicator
 from indicators.morningStar import MorningStar
 from indicators.nGreenCandles import NGreenCandles
 from indicators.nRedCandles import NRedCandles
+from indicators.nearEma import NearEMA
+from indicators.nearResistance import NearResistance
+from indicators.nearSupport import NearSupport
 from indicators.priceAboveBollingerBand import PriceAboveBollingerBand
 from indicators.priceBelowBolingerBand import PriceBelowBollingerBand
 from indicators.rsi import RSI
@@ -50,7 +53,10 @@ INDICATOR_MAP = {
     "BollingerBandReEntry": BollingerBandReEntry,
     "BollingerBandWidth": BollingerBandWidth,
     "PriceBelowBollingerBand": PriceBelowBollingerBand,
-    "PriceAboveBollingerBand": PriceAboveBollingerBand
+    "PriceAboveBollingerBand": PriceAboveBollingerBand,
+    "NearSupport": NearSupport,
+    "NearEMA": NearEMA,
+    "NearResistance": NearResistance
 }
 
 def get_indicator_instance(name: str, all_params: dict) -> Indicator:

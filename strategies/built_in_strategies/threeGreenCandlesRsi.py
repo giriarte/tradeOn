@@ -29,6 +29,8 @@ from indicators.harami import Harami
 from indicators.indicator import Indicator
 from indicators.morningStar import MorningStar
 from indicators.nGreenCandles import NGreenCandles
+from indicators.nearEma import NearEMA
+from indicators.nearSupport import NearSupport
 from indicators.rsi import RSI
 from indicators.shootingStar import ShootingStar
 from strategies.strategy import TradeStrategy, Position
@@ -66,6 +68,16 @@ class ThreeGreenCandlesRsi(TradeStrategy):
         },
         "BollingerBandWidth": {
             "bb_variation_min": 7.0
+        },
+        "NearSupport": {
+            "support_lookback": 100,
+            "tolerance_pct": 0.4,
+            OPERATION_TYPE: 1
+        },
+        "NearEMA": {
+            "ema_length": 50, 
+            "tolerance_pct": 0.05,
+            OPERATION_TYPE: 1
         }
     } # Inidicators parameters
 
@@ -73,7 +85,7 @@ class ThreeGreenCandlesRsi(TradeStrategy):
     baseIndicators: t.List[Indicator] = [
         # NGreenCandles("NGreenCandles", defaultParams.get("NGreenCandles", {})),
         # RSI("RSI", defaultParams.get("RSI", {}))
-        BollingerBandWidth("BollingerBandWidth", defaultParams.get("BollingerBandWidth", {}))
+        NearEMA("NearEMA", defaultParams.get("NearEMA", {}))
     ] # Indicators here are mandatory conditions to generate a position
 
     enhancers: t.List[Indicator] = [] # Enhancers indicators can increase the position category

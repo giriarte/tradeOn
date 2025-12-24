@@ -36,5 +36,7 @@ LOOKBACK = 'lookback'
 
 # Indicators column names
 CLOSE_COLUMN = 'Close'
+LOW_COLUMN = 'Low'
+HIGH_COLUMN = 'High'
 OPEN_COLUMN = 'Open'
 RSI_COLUMN = 'RSI'
