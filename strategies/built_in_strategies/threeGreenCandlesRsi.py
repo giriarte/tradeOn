@@ -28,6 +28,8 @@ from indicators.hammer import Hammer
 from indicators.hangingMan import HangingMan
 from indicators.harami import Harami
 from indicators.indicator import Indicator
+from indicators.macdCross import MACDCross
+from indicators.macdDivergence import MACDDivergence
 from indicators.morningStar import MorningStar
 from indicators.nGreenCandles import NGreenCandles
 from indicators.nearEma import NearEMA
@@ -86,7 +88,7 @@ class ThreeGreenCandlesRsi(TradeStrategy):
     baseIndicators: t.List[Indicator] = [
         # NGreenCandles("NGreenCandles", defaultParams.get("NGreenCandles", {})),
         # RSI("RSI", defaultParams.get("RSI", {}))
-        ClosePrice("ClosePrice", defaultParams.get("ClosePrice", {}))
+        MACDDivergence("MACDDivergence", defaultParams.get("MACDDivergence", {}))
     ] # Indicators here are mandatory conditions to generate a position
 
     enhancers: t.List[Indicator] = [] # Enhancers indicators can increase the position category

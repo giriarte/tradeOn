@@ -30,6 +30,11 @@ BB_STD = 'bb_std'
 BB_VARIATION_MIN = 'bb_variation_min'
 BB_VARIATION_MAX = 'bb_variation_max'
 
+# MACD Keys
+MACD_FAST = 'macd_fast'
+MACD_SLOW = 'macd_slow'
+MACD_SIGNAL = 'macd_signal'
+
 # General Constants
 OPERATION_TYPE = 'operation_type'
 LOOKBACK = 'lookback'

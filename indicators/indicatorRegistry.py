@@ -18,6 +18,8 @@ from indicators.hammer import Hammer
 from indicators.hangingMan import HangingMan
 from indicators.harami import Harami
 from indicators.indicator import Indicator
+from indicators.macdCross import MACDCross
+from indicators.macdDivergence import MACDDivergence
 from indicators.morningStar import MorningStar
 from indicators.nGreenCandles import NGreenCandles
 from indicators.nRedCandles import NRedCandles
@@ -58,7 +60,9 @@ INDICATOR_MAP = {
     "NearSupport": NearSupport,
     "NearEMA": NearEMA,
     "NearResistance": NearResistance,
-    "ClosePrice": ClosePrice
+    "ClosePrice": ClosePrice,
+    "MACDCross": MACDCross,
+    "MACDDivergence": MACDDivergence
 }
 
 def get_indicator_instance(name: str, all_params: dict) -> Indicator:

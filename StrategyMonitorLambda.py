@@ -2,6 +2,7 @@ import yfinance as yf
 import sys
 import os
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import numpy as np
 import boto3
 from botocore.exceptions import ClientError
@@ -48,83 +49,62 @@ def pointpos(x, xsignal):
         return np.nan
 
 def plot_with_signal(dfpl):
-    # 1. Setup Data
     dfpl = dfpl.copy()
     
-    # Calculate EMAs (as per your snippet)
+    # --- 1. Indicator Calculations ---
+    # EMAs
     dfpl['EMA_9'] = ta.ema(dfpl[CLOSE_COLUMN], length=15)
     dfpl['EMA_21'] = ta.ema(dfpl[CLOSE_COLUMN], length=50)
     
-    # Calculate Bollinger Bands (Length 20, Std Dev 2)
-    bb_length = 20
-    bb_std = 2.0
-    bb = ta.bbands(dfpl[CLOSE_COLUMN], length=bb_length, std=bb_std)
+    # Bollinger Bands
+    bb_len, bb_std = 20, 2.0
+    bb = ta.bbands(dfpl[CLOSE_COLUMN], length=bb_len, std=bb_std)
+    dfpl['BBL'] = bb[f'BBL_{bb_len}_{bb_std}_{bb_std}']
+    dfpl['BBU'] = bb[f'BBU_{bb_len}_{bb_std}_{bb_std}']
     
-    # Extract BB columns (naming convention: BBL_length_std)
-    dfpl['BBL'] = bb[f'BBL_{bb_length}_{bb_std}_{bb_std}']
-    dfpl['BBM'] = bb[f'BBM_{bb_length}_{bb_std}_{bb_std}']
-    dfpl['BBU'] = bb[f'BBU_{bb_length}_{bb_std}_{bb_std}']
+    # MACD
+    macd = ta.macd(dfpl[CLOSE_COLUMN], fast=12, slow=26, signal=9)
+    dfpl['MACD'] = macd['MACD_12_26_9']
+    dfpl['MACD_S'] = macd['MACDs_12_26_9']
+    dfpl['MACD_H'] = macd['MACDh_12_26_9']
 
-    fig = go.Figure()
+    # --- 2. Create Subplots ---
+    # We increase vertical_spacing to 0.15 to leave room for the range slider
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, 
+                        vertical_spacing=0.15, 
+                        row_heights=[0.7, 0.3])
 
-    # 2. Add Bollinger Bands (Adding these first so they sit behind candlesticks)
-    # Upper Band
-    fig.add_trace(go.Scatter(
-        x=dfpl.index, y=dfpl['BBU'],
-        line=dict(color='rgba(173, 216, 230, 0.4)', width=1),
-        name="BB Upper"
-    ))
-
-    # Lower Band with Fill
-    fig.add_trace(go.Scatter(
-        x=dfpl.index, y=dfpl['BBL'],
-        line=dict(color='rgba(173, 216, 230, 0.4)', width=1),
-        fill='tonexty', # Fills the area between BBU and BBL
-        fillcolor='rgba(173, 216, 230, 0.1)', 
-        name="BB Lower"
-    ))
-
-    # 3. Add Candlesticks
+    # --- ROW 1: Price Chart ---
     fig.add_trace(go.Candlestick(
-        x=dfpl.index,
-        open=dfpl[OPEN_COLUMN],
-        high=dfpl['High'],
-        low=dfpl['Low'],
-        close=dfpl[CLOSE_COLUMN],
-        name="Candlesticks"
-    ))
+        x=dfpl.index, open=dfpl[OPEN_COLUMN], high=dfpl['High'],
+        low=dfpl['Low'], close=dfpl[CLOSE_COLUMN], name="Price"
+    ), row=1, col=1)
 
-    # 4. Add the EMA Lines
-    fig.add_trace(go.Scatter(
-        x=dfpl.index, y=dfpl['EMA_21'], 
-        line=dict(color='yellow', width=1.5), 
-        name="EMA 21"
-    ))
+    # Overlays
+    fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['BBU'], line=dict(color="#084248"), name="BBU"), row=1, col=1)
+    fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['BBL'], line=dict(color='#084248'), fill='tonexty', name="BBL"), row=1, col=1)
+    fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['EMA_9'], line=dict(color='orange', width=1), name="EMA 9"), row=1, col=1)
+    fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['EMA_21'], line=dict(color='yellow', width=1), name="EMA 21"), row=1, col=1)
+    fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['pointpos'], mode="markers", 
+                             marker=dict(size=10, color="MediumPurple", symbol="diamond"), name="Signal"), row=1, col=1)
 
-    fig.add_trace(go.Scatter(
-        x=dfpl.index, y=dfpl['EMA_9'], 
-        line=dict(color='orange', width=1.5), 
-        name="EMA 9"
-    ))
+    # --- ROW 2: MACD ---
+    fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['MACD'], line=dict(color='#00E6FF', width=1.5), name="MACD"), row=2, col=1)
+    fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['MACD_S'], line=dict(color='#FF00FF', width=1.5), name="Signal Line"), row=2, col=1)
+    
+    colors = ['#26A69A' if val >= 0 else '#EF5350' for val in dfpl['MACD_H']]
+    fig.add_trace(go.Bar(x=dfpl.index, y=dfpl['MACD_H'], marker_color=colors, name="Histogram"), row=2, col=1)
 
-    # 5. Add the Signals (Markers)
-    fig.add_scatter(
-        x=dfpl.index, y=dfpl['pointpos'], 
-        mode="markers",
-        marker=dict(size=10, color="MediumPurple", symbol="diamond"),
-        name="Signal"
-    )
-
-    # 6. Layout styling
+    # --- 3. Layout & Range Slider ---
     fig.update_layout(
-        autosize=False,
-        width=1200,
-        height=800, 
-        paper_bgcolor='black',
-        plot_bgcolor='black',
-        legend=dict(font=dict(color="white"))
+        autosize=False, width=1200, height=900,
+        paper_bgcolor='black', plot_bgcolor='black',
+        legend=dict(font=dict(color="white")),
+        # Enable Range Slider on the X-axis of Row 1
+        xaxis=dict(rangeslider=dict(visible=True, thickness=0.05), type='date')
     )
     
+    # Formatting axes
     fig.update_xaxes(gridcolor='#333333', zeroline=False)
     fig.update_yaxes(gridcolor='#333333', zeroline=False)
     
