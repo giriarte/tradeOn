@@ -11,6 +11,10 @@ SIGNAL_SELL = 2
 RSI_LENGTH = 'rsi_length'
 RSI_BUY_THRESHOLD = 'rsi_buy_threshold'
 RSI_SELL_THRESHOLD = 'rsi_sell_threshold'
+STOCH_LENGTH = 'stoch_length'
+K_PERIOD = 'k_period'
+D_PERIOD = 'd_period'
+THRESHOLD = 'threshold'
 
 # N-Candles Keys
 N_CANDLES_LENGTH = 'n_candles_length'

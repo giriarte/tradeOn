@@ -36,6 +36,8 @@ from indicators.nearEma import NearEMA
 from indicators.nearSupport import NearSupport
 from indicators.rsi import RSI
 from indicators.shootingStar import ShootingStar
+from indicators.stochasticRSICross import StochasticRSICross
+from indicators.stochasticRSILevel import StochasticRSILevel
 from strategies.strategy import TradeStrategy, Position
 
 Dictionary = t.Dict[str, t.Dict[str, t.Any]] # Represents the default parameters map
@@ -88,7 +90,7 @@ class ThreeGreenCandlesRsi(TradeStrategy):
     baseIndicators: t.List[Indicator] = [
         # NGreenCandles("NGreenCandles", defaultParams.get("NGreenCandles", {})),
         # RSI("RSI", defaultParams.get("RSI", {}))
-        MACDDivergence("MACDDivergence", defaultParams.get("MACDDivergence", {}))
+        StochasticRSICross("StochasticRSICross", defaultParams.get("StochasticRSICross", {}))
     ] # Indicators here are mandatory conditions to generate a position
 
     enhancers: t.List[Indicator] = [] # Enhancers indicators can increase the position category

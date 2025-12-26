@@ -30,6 +30,8 @@ from indicators.priceAboveBollingerBand import PriceAboveBollingerBand
 from indicators.priceBelowBolingerBand import PriceBelowBollingerBand
 from indicators.rsi import RSI
 from indicators.shootingStar import ShootingStar
+from indicators.stochasticRSICross import StochasticRSICross
+from indicators.stochasticRSILevel import StochasticRSILevel
 
 # --- Indicator Registry ---
 # Map the string name in DynamoDB to the class implementation
@@ -62,7 +64,9 @@ INDICATOR_MAP = {
     "NearResistance": NearResistance,
     "ClosePrice": ClosePrice,
     "MACDCross": MACDCross,
-    "MACDDivergence": MACDDivergence
+    "MACDDivergence": MACDDivergence,
+    "StochasticRSILevel": StochasticRSILevel,
+    "StochasticRSICross": StochasticRSICross
 }
 
 def get_indicator_instance(name: str, all_params: dict) -> Indicator:

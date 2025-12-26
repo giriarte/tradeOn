@@ -68,11 +68,18 @@ def plot_with_signal(dfpl):
     dfpl['MACD_S'] = macd['MACDs_12_26_9']
     dfpl['MACD_H'] = macd['MACDh_12_26_9']
 
-    # --- 2. Create Subplots ---
-    # We increase vertical_spacing to 0.15 to leave room for the range slider
-    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, 
-                        vertical_spacing=0.15, 
-                        row_heights=[0.7, 0.3])
+    # Stochastic RSI
+    stoch_rsi = ta.stochrsi(dfpl[CLOSE_COLUMN], length=14, rsi_length=14, k=3, d=3)
+    dfpl['STOCH_K'] = stoch_rsi['STOCHRSIk_14_14_3_3']
+    dfpl['STOCH_D'] = stoch_rsi['STOCHRSId_14_14_3_3']
+
+    # --- 2. Create Subplots (3 Rows) ---
+    fig = make_subplots(
+        rows=3, cols=1, 
+        shared_xaxes=True, 
+        vertical_spacing=0.07, 
+        row_heights=[0.5, 0.25, 0.25]
+    )
 
     # --- ROW 1: Price Chart ---
     fig.add_trace(go.Candlestick(
@@ -94,6 +101,14 @@ def plot_with_signal(dfpl):
     
     colors = ['#26A69A' if val >= 0 else '#EF5350' for val in dfpl['MACD_H']]
     fig.add_trace(go.Bar(x=dfpl.index, y=dfpl['MACD_H'], marker_color=colors, name="Histogram"), row=2, col=1)
+
+    # --- ROW 3: Stochastic RSI ---
+    fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['STOCH_K'], line=dict(color='white', width=1.2), name="Stoch %K"), row=3, col=1)
+    fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['STOCH_D'], line=dict(color='yellow', width=1.2, dash='dot'), name="Stoch %D"), row=3, col=1)
+
+    # Add Threshold Lines for Stoch RSI
+    fig.add_hline(y=80, line_dash="dash", line_color="red", line_width=1, row=3, col=1)
+    fig.add_hline(y=20, line_dash="dash", line_color="green", line_width=1, row=3, col=1)
 
     # --- 3. Layout & Range Slider ---
     fig.update_layout(
