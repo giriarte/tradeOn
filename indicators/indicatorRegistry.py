@@ -1,11 +1,14 @@
 import typing as t
 
 from indicators.InvertedHammer import InvertedHammer
+from indicators.adxRange import ADXRange
 from indicators.bearishCandlePattern import BearishCandlePattern
 from indicators.bollingerBandReEntry import BollingerBandReEntry
 from indicators.bollingerBandWidth import BollingerBandWidth
 from indicators.bullishCandlePattern import BullishCandlePattern
 from indicators.closePrice import ClosePrice
+from indicators.dmnRange import DMNRange
+from indicators.dmpRange import DMPRange
 from indicators.doji import Doji
 from indicators.dragonFlyDoji import DragonflyDoji
 from indicators.emaCross import EMACross
@@ -66,7 +69,10 @@ INDICATOR_MAP = {
     "MACDCross": MACDCross,
     "MACDDivergence": MACDDivergence,
     "StochasticRSILevel": StochasticRSILevel,
-    "StochasticRSICross": StochasticRSICross
+    "StochasticRSICross": StochasticRSICross,
+    "ADXRange": ADXRange,
+    "DMPRange": DMPRange,
+    "DMNRange": DMNRange
 }
 
 def get_indicator_instance(name: str, all_params: dict) -> Indicator:

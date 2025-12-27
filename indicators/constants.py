@@ -28,6 +28,15 @@ MIN_SLOPE_PCT = 'min_slope_pct'
 EMA_HIGH = 'ema_high'
 EMA_LOW = 'ema_low'
 
+# ADX Keys
+ADX_LENGTH = 'adx_length'
+ADX_MIN = 'adx_min'
+ADX_MAX = 'adx_max'
+DMP_MIN = 'dmp_min'
+DMP_MAX = 'dmp_max'
+DMN_MIN = 'dmn_min'
+DMN_MAX = 'dmn_max'
+
 # Bollinger Bands keys
 BB_LENGTH = 'bb_length'
 BB_STD = 'bb_std'

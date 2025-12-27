@@ -1,5 +1,6 @@
 import typing as t
 from indicators.InvertedHammer import InvertedHammer
+from indicators.adxRange import ADXRange
 from indicators.bearishCandlePattern import BearishCandlePattern
 from indicators.bollingerBandReEntry import BollingerBandReEntry
 from indicators.bollingerBandWidth import BollingerBandWidth
@@ -16,6 +17,8 @@ from indicators.constants import (
     RSI_LENGTH, 
     RSI_SELL_THRESHOLD
 )
+from indicators.dmnRange import DMNRange
+from indicators.dmpRange import DMPRange
 from indicators.doji import Doji
 from indicators.dragonFlyDoji import DragonflyDoji
 from indicators.emaCross import EMACross
@@ -83,6 +86,11 @@ class ThreeGreenCandlesRsi(TradeStrategy):
             "ema_length": 50, 
             "tolerance_pct": 0.05,
             OPERATION_TYPE: 1
+        },
+        "DMNRange": {
+            "dmn_min": 20.0,
+            "dmn_max": 35.0,
+            OPERATION_TYPE: 1
         }
     } # Inidicators parameters
 
@@ -90,7 +98,7 @@ class ThreeGreenCandlesRsi(TradeStrategy):
     baseIndicators: t.List[Indicator] = [
         # NGreenCandles("NGreenCandles", defaultParams.get("NGreenCandles", {})),
         # RSI("RSI", defaultParams.get("RSI", {}))
-        StochasticRSICross("StochasticRSICross", defaultParams.get("StochasticRSICross", {}))
+        DMNRange("DMNRange", defaultParams.get("DMNRange", {}))
     ] # Indicators here are mandatory conditions to generate a position
 
     enhancers: t.List[Indicator] = [] # Enhancers indicators can increase the position category
