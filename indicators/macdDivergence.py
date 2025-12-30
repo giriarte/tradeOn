@@ -7,6 +7,7 @@ from indicators.constants import (
     LOOKBACK,
     LOW_COLUMN,
     HIGH_COLUMN,
+    OPERATION_TYPE,
     SIGNAL_BUY,
     SIGNAL_SELL,
     SIGNAL_HOLD,
@@ -35,7 +36,7 @@ class MACDDivergence(Indicator):
             slow = int(params.get(MACD_SLOW, 26))
             signal_period = int(params.get(MACD_SIGNAL, 9))
             lookback = int(params.get(LOOKBACK, 20))
-            operation_type = params.get('operation_type', SIGNAL_BUY)
+            operation_type = int(params.get(OPERATION_TYPE, SIGNAL_BUY))
         except (ValueError, TypeError):
             print("Invalid parameter types for MACDDivergence indicator.")
             return SIGNAL_HOLD

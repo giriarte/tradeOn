@@ -3,8 +3,11 @@ import typing as t
 from .indicator import Indicator
 from indicators.constants import (
     CLOSE_COLUMN,
+    OPERATION_TYPE,
     SIGNAL_BUY,
-    SIGNAL_HOLD
+    SIGNAL_HOLD,
+    TARGET_LEVEL,
+    TOLERANCE_PCT
 )
 
 class ClosePrice(Indicator):
@@ -24,9 +27,9 @@ class ClosePrice(Indicator):
 
         # --- 1. Parameter Extraction ---
         try:
-            target_level = float(params.get('target_level'))
-            tolerance_pct = float(params.get('tolerance_pct', 0.5))
-            operation_type = params.get('operation_type', SIGNAL_BUY)
+            target_level = float(params.get(TARGET_LEVEL))
+            tolerance_pct = float(params.get(TOLERANCE_PCT, 0.5))
+            operation_type = params.get(OPERATION_TYPE, SIGNAL_BUY)
         except (ValueError, TypeError, KeyError):
             print("Error: Invalid parameters for ClosePrice indicator.")
             # If target_level is missing or invalid, we cannot evaluate
@@ -45,6 +48,7 @@ class ClosePrice(Indicator):
 
         # Check if the price is "close enough"
         if diff_pct <= tolerance_pct:
+            print(f'close value found in ClosePrice indicator for level ${target_level} with tolerance {tolerance_pct}%')
             return operation_type
 
         return SIGNAL_HOLD

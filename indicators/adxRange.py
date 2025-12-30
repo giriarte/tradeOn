@@ -9,6 +9,7 @@ from indicators.constants import (
     CLOSE_COLUMN,
     HIGH_COLUMN,
     LOW_COLUMN,
+    OPERATION_TYPE,
     SIGNAL_BUY,
     SIGNAL_HOLD
 )
@@ -33,7 +34,7 @@ class ADXRange(Indicator):
             length = int(params.get(ADX_LENGTH, 14))
             adx_min = params.get(ADX_MIN)
             adx_max = params.get(ADX_MAX)
-            operation_type = params.get('operation_type', SIGNAL_BUY)
+            operation_type = int(params.get(OPERATION_TYPE, SIGNAL_BUY))
         except (ValueError, TypeError):
             print("Invalid parameters provided to ADXRange indicator.")
             return SIGNAL_HOLD

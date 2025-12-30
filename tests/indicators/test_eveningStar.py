@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 import pandas as pd
-from indicators.constants import SIGNAL_SELL, SIGNAL_HOLD
+from indicators.constants import CLOSE_COLUMN, HIGH_COLUMN, LOW_COLUMN, OPEN_COLUMN, SIGNAL_SELL, SIGNAL_HOLD
 from indicators.eveningStar import EveningStar
 
 class TestEveningStar(unittest.TestCase):
@@ -13,10 +13,10 @@ class TestEveningStar(unittest.TestCase):
         
         # Evening Star is a 3-candle pattern, so we provide at least 3 rows
         self.df = pd.DataFrame({
-            "Open":  [100.0, 110.0, 108.0],
-            "High":  [112.0, 115.0, 109.0],
-            "Low":   [99.0,  109.0, 102.0],
-            "Close": [110.0, 111.0, 103.0]
+            OPEN_COLUMN:  [100.0, 110.0, 108.0],
+            HIGH_COLUMN:  [112.0, 115.0, 109.0],
+            LOW_COLUMN:   [99.0,  109.0, 102.0],
+            CLOSE_COLUMN: [110.0, 111.0, 103.0]
         }, index=pd.date_range("2025-01-01", periods=3))
 
     @patch("pandas_ta.cdl_pattern")

@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 import pandas as pd
-from indicators.constants import SIGNAL_BUY, SIGNAL_HOLD
+from indicators.constants import CLOSE_COLUMN, HIGH_COLUMN, LOW_COLUMN, OPEN_COLUMN, SIGNAL_BUY, SIGNAL_HOLD
 from indicators.morningStar import MorningStar
 
 class TestMorningStar(unittest.TestCase):
@@ -16,10 +16,10 @@ class TestMorningStar(unittest.TestCase):
         # Candle 2: Small Body (Indecision)
         # Candle 3: Large Bullish
         self.df = pd.DataFrame({
-            "Open":  [110.0, 100.0, 102.0],
-            "High":  [111.0, 101.0, 108.0],
-            "Low":   [100.0, 98.0,  101.0],
-            "Close": [101.0, 99.0,  107.0]
+            OPEN_COLUMN:  [110.0, 100.0, 102.0],
+            HIGH_COLUMN:  [111.0, 101.0, 108.0],
+            LOW_COLUMN:   [100.0, 98.0,  101.0],
+            CLOSE_COLUMN: [101.0, 99.0,  107.0]
         }, index=pd.date_range("2025-01-01", periods=3))
 
     @patch("pandas_ta.cdl_pattern")

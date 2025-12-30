@@ -2,6 +2,10 @@ import pandas_ta as ta
 import typing as t
 
 from indicators.constants import ( 
+    CLOSE_COLUMN,
+    HIGH_COLUMN,
+    LOW_COLUMN,
+    OPEN_COLUMN,
     RSI_COLUMN,
     RSI_LENGTH,
     RSI_SELL_THRESHOLD,
@@ -24,7 +28,7 @@ class MorningStar(Indicator):
 
     def evaluate(self, df: t.Any, params: t.Optional[t.Dict[str, t.Any]] = None) -> int:
         return_signal = SIGNAL_HOLD
-        morningStarValue = ta.cdl_pattern(df["Open"], df["High"], df["Low"], df["Close"], name="morningstar")
+        morningStarValue = ta.cdl_pattern(df[OPEN_COLUMN], df[HIGH_COLUMN], df[LOW_COLUMN], df[CLOSE_COLUMN], name="morningstar")
         
         # Extract the last value
         # TA-Lib returns 100 for a bullish signal; we convert it to 1

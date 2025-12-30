@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 import pandas as pd
-from indicators.constants import SIGNAL_SELL, SIGNAL_HOLD
+from indicators.constants import CLOSE_COLUMN, HIGH_COLUMN, LOW_COLUMN, OPEN_COLUMN, SIGNAL_SELL, SIGNAL_HOLD
 from indicators.gravestoneDoji import GravestoneDoji
 
 class TestGravestoneDoji(unittest.TestCase):
@@ -13,10 +13,10 @@ class TestGravestoneDoji(unittest.TestCase):
         
         # We provide 3 rows to simulate a short time series
         self.df = pd.DataFrame({
-            "Open":  [100.0, 102.0, 105.0],
-            "High":  [103.0, 105.0, 115.0], # Final candle has long upper wick
-            "Low":   [98.0,  101.0, 105.0], # Final candle Low = Open = Close
-            "Close": [102.0, 104.0, 105.0]
+            OPEN_COLUMN:  [100.0, 102.0, 105.0],
+            HIGH_COLUMN:  [103.0, 105.0, 115.0], # Final candle has long upper wick
+            LOW_COLUMN:   [98.0,  101.0, 105.0], # Final candle Low = Open = Close
+            CLOSE_COLUMN: [102.0, 104.0, 105.0]
         }, index=pd.date_range("2025-01-01", periods=3))
 
     @patch("pandas_ta.cdl_pattern")

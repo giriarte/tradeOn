@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 import pandas as pd
-from indicators.constants import SIGNAL_BUY, SIGNAL_HOLD
+from indicators.constants import CLOSE_COLUMN, MACD_FAST, MACD_SIGNAL, MACD_SLOW, OPERATION_TYPE, SIGNAL_BUY, SIGNAL_HOLD
 from indicators.macdCross import MACDCross
 
 class TestMACDCross(unittest.TestCase):
@@ -21,8 +21,8 @@ class TestMACDCross(unittest.TestCase):
         })
         mock_macd.return_value = mock_output
         
-        data = pd.DataFrame({"Close": [100.0] * 35}) # Enough data to pass validation
-        params = {'fast': 12, 'slow': 26, 'signal': 9, 'operation_type': SIGNAL_BUY}
+        data = pd.DataFrame({CLOSE_COLUMN: [100.0] * 35}) # Enough data to pass validation
+        params = {MACD_FAST: 12, MACD_SLOW: 26, MACD_SIGNAL: 9, OPERATION_TYPE: SIGNAL_BUY}
         
         indicator = MACDCross(name="MACD_Test", params=params)
         self.assertEqual(indicator.evaluate(data), SIGNAL_BUY)

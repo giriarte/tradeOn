@@ -34,8 +34,9 @@ class EMASlope(Indicator):
             lookback = int(params.get(LOOKBACK, 5))
             min_slope_pct = float(params.get(MIN_SLOPE_PCT, 1.0))
             # Default to SIGNAL_BUY as a "Trend Active" confirmation
-            operation_type = params.get(OPERATION_TYPE, SIGNAL_BUY)
+            operation_type = int(params.get(OPERATION_TYPE, SIGNAL_BUY))
         except (ValueError, TypeError):
+            print(f'ValueError obtaining emaSlope parameters')
             return SIGNAL_HOLD
 
         # --- 2. Data Validation ---
@@ -63,6 +64,7 @@ class EMASlope(Indicator):
         # If the absolute percentage change is greater than our "cap" or threshold,
         # we consider the trend strong enough to trade.
         if abs_slope_pct >= min_slope_pct:
+            print(f'emaSlope identified with absolute slope percentage ${abs_slope_pct} exceeding minimum ${min_slope_pct}')
             return operation_type
 
         return SIGNAL_HOLD

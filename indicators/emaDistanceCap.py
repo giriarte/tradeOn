@@ -30,7 +30,7 @@ class EMADistanceCap(Indicator):
         # --- 1. Parameter Extraction ---
         ema_length = int(params.get(EMA_LENGTH, 20))
         distance_pct_cap = float(params.get(DISTANCE_PCT_CAP, 1.0))
-        operation_type = params.get(OPERATION_TYPE, SIGNAL_BUY)
+        operation_type = int(params.get(OPERATION_TYPE, SIGNAL_BUY))
 
         # --- 2. Data Validation ---
         if len(data) < ema_length or CLOSE_COLUMN not in data.columns:
@@ -55,12 +55,14 @@ class EMADistanceCap(Indicator):
             # Example: distance is 0.5% and cap is 1.0% -> TRUE
             # Example: distance is 1.5% and cap is 1.0% -> FALSE (Too far)
             if 0 <= actual_dist_pct <= distance_pct_cap:
+                print(f'emaDistanceCap identified for actual percentage ${actual_dist_pct} lower than CAP ${distance_pct_cap}')
                 return SIGNAL_BUY
         
         elif operation_type == SIGNAL_SELL:
             # Condition: Price must be BELOW EMA, but within the CAP
             # actual_dist_pct will be negative (e.g., -0.5%)
             if -distance_pct_cap <= actual_dist_pct <= 0:
+                print(f'emaDistanceCap identified for actual percentage ${actual_dist_pct} greater than CAP ${distance_pct_cap}')
                 return SIGNAL_SELL
 
         return SIGNAL_HOLD

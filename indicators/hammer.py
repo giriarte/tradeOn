@@ -2,6 +2,10 @@ import pandas_ta as ta
 import typing as t
 
 from indicators.constants import ( 
+    CLOSE_COLUMN,
+    HIGH_COLUMN,
+    LOW_COLUMN,
+    OPEN_COLUMN,
     SIGNAL_BUY,
     SIGNAL_HOLD
 )
@@ -25,15 +29,15 @@ class Hammer(Indicator):
         if params is None:
             params = self.params
 
-        hammer_series = ta.cdl_pattern(df["Open"], df["High"], df["Low"], df["Close"], name="hammer")
+        hammer_series = ta.cdl_pattern(df[OPEN_COLUMN], df[HIGH_COLUMN], df[LOW_COLUMN], df[CLOSE_COLUMN], name="hammer")
         
         if hammer_series is not None and not hammer_series.empty:
             last_signal = hammer_series.iloc[-1].values[0]
             
             if last_signal == 100:
                 # Get the last candle's OHLC
-                last_open = df["Open"].iloc[-1]
-                last_close = df["Close"].iloc[-1]
+                last_open = df[OPEN_COLUMN].iloc[-1]
+                last_close = df[CLOSE_COLUMN].iloc[-1]
                 
                 # Check if it's a Green candle (Close > Open)
                 if last_close > last_open:

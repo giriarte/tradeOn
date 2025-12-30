@@ -2,7 +2,10 @@ import pandas_ta as ta
 import typing as t
 
 from indicators.constants import ( 
-    SIGNAL_BUY,
+    CLOSE_COLUMN,
+    HIGH_COLUMN,
+    LOW_COLUMN,
+    OPEN_COLUMN,
     SIGNAL_HOLD,
     SIGNAL_SELL
 )
@@ -27,7 +30,7 @@ class EveningStar(Indicator):
         return_signal = SIGNAL_HOLD
         
         # Use the 'eveningstar' pattern
-        eveningStarValue = ta.cdl_pattern(df["Open"], df["High"], df["Low"], df["Close"], name="eveningstar")
+        eveningStarValue = ta.cdl_pattern(df[OPEN_COLUMN], df[HIGH_COLUMN], df[LOW_COLUMN], df[CLOSE_COLUMN], name="eveningstar")
         
         # Extract the last value
         # TA-Lib returns -100 for a bearish signal

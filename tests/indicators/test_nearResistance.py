@@ -1,6 +1,6 @@
 import unittest
 import pandas as pd
-from indicators.constants import SIGNAL_SELL, SIGNAL_HOLD, CLOSE_COLUMN, HIGH_COLUMN
+from indicators.constants import OPERATION_TYPE, RESISTANCE_LOOKBACK, SIGNAL_SELL, SIGNAL_HOLD, CLOSE_COLUMN, HIGH_COLUMN, TOLERANCE_PCT
 from indicators.nearResistance import NearResistance
 
 class TestNearResistance(unittest.TestCase):
@@ -16,9 +16,9 @@ class TestNearResistance(unittest.TestCase):
         })
         
         params = {
-            'resistance_lookback': 3, 
-            'tolerance_pct': 0.5, 
-            'operation_type': SIGNAL_SELL
+            RESISTANCE_LOOKBACK: 3, 
+            TOLERANCE_PCT: 0.5, 
+            OPERATION_TYPE: SIGNAL_SELL
         }
         
         indicator = NearResistance(name="NearResistance_Test", params=params)

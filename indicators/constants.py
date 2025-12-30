@@ -51,6 +51,10 @@ MACD_SIGNAL = 'macd_signal'
 # General Constants
 OPERATION_TYPE = 'operation_type'
 LOOKBACK = 'lookback'
+TARGET_LEVEL = 'target_level'
+TOLERANCE_PCT = 'tolerance_pct'
+RESISTANCE_LOOKBACK = 'resistance_lookback'
+SUPPORT_LOOKBACK = 'support_lookback'
 
 # Indicators column names
 CLOSE_COLUMN = 'Close'

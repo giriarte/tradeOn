@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 import pandas as pd
-from indicators.constants import SIGNAL_SELL, SIGNAL_HOLD
+from indicators.constants import CLOSE_COLUMN, HIGH_COLUMN, LOW_COLUMN, OPEN_COLUMN, SIGNAL_SELL, SIGNAL_HOLD
 from indicators.hangingMan import HangingMan
 
 class TestHangingMan(unittest.TestCase):
@@ -21,10 +21,10 @@ class TestHangingMan(unittest.TestCase):
         # Create a Red Candle (Close 101 < Open 105)
         # Long lower wick: Low is 90
         data = {
-            "Open":  [100.0, 105.0],
-            "High":  [102.0, 106.0],
-            "Low":   [98.0,  90.0],
-            "Close": [101.0, 101.0]
+            OPEN_COLUMN:  [100.0, 105.0],
+            HIGH_COLUMN:  [102.0, 106.0],
+            LOW_COLUMN:   [98.0,  90.0],
+            CLOSE_COLUMN: [101.0, 101.0]
         }
         df = pd.DataFrame(data, index=pd.date_range("2025-01-01", periods=2))
 
@@ -43,10 +43,10 @@ class TestHangingMan(unittest.TestCase):
         
         # Create a Green Candle (Close 105 > Open 101)
         data = {
-            "Open":  [100.0, 101.0],
-            "High":  [102.0, 106.0],
-            "Low":   [98.0,  90.0],
-            "Close": [101.0, 105.0]
+            OPEN_COLUMN:  [100.0, 101.0],
+            HIGH_COLUMN:  [102.0, 106.0],
+            LOW_COLUMN:   [98.0,  90.0],
+            CLOSE_COLUMN: [101.0, 105.0]
         }
         df = pd.DataFrame(data, index=pd.date_range("2025-01-01", periods=2))
 
@@ -63,8 +63,8 @@ class TestHangingMan(unittest.TestCase):
         mock_cdl.return_value = mock_output
         
         data = {
-            "Open": [100, 105], "High": [106, 107], 
-            "Low": [99, 104], "Close": [105, 106]
+            OPEN_COLUMN: [100, 105], HIGH_COLUMN: [106, 107], 
+            LOW_COLUMN: [99, 104], CLOSE_COLUMN: [105, 106]
         }
         df = pd.DataFrame(data, index=pd.date_range("2025-01-01", periods=2))
 

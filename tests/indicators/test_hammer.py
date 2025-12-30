@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 import pandas as pd
-from indicators.constants import SIGNAL_BUY, SIGNAL_HOLD
+from indicators.constants import CLOSE_COLUMN, HIGH_COLUMN, LOW_COLUMN, OPEN_COLUMN, SIGNAL_BUY, SIGNAL_HOLD
 from indicators.hammer import Hammer
 
 class TestHammer(unittest.TestCase):
@@ -20,10 +20,10 @@ class TestHammer(unittest.TestCase):
         
         # Create a Green Candle (Close 105 > Open 101)
         data = {
-            "Open":  [110.0, 101.0],
-            "High":  [112.0, 106.0],
-            "Low":   [108.0, 90.0],
-            "Close": [105.0, 105.0]
+            OPEN_COLUMN:  [110.0, 101.0],
+            HIGH_COLUMN:  [112.0, 106.0],
+            LOW_COLUMN:   [108.0, 90.0],
+            CLOSE_COLUMN: [105.0, 105.0]
         }
         df = pd.DataFrame(data, index=pd.date_range("2025-01-01", periods=2))
 
@@ -42,10 +42,10 @@ class TestHammer(unittest.TestCase):
         
         # Create a Red Candle (Close 99 < Open 101)
         data = {
-            "Open":  [110.0, 101.0],
-            "High":  [112.0, 102.0],
-            "Low":   [108.0, 90.0],
-            "Close": [105.0, 99.0]
+            OPEN_COLUMN:  [110.0, 101.0],
+            HIGH_COLUMN:  [112.0, 102.0],
+            LOW_COLUMN:   [108.0, 90.0],
+            CLOSE_COLUMN: [105.0, 99.0]
         }
         df = pd.DataFrame(data, index=pd.date_range("2025-01-01", periods=2))
 
@@ -62,8 +62,8 @@ class TestHammer(unittest.TestCase):
         mock_cdl.return_value = mock_output
         
         data = {
-            "Open": [100, 101], "High": [102, 103], 
-            "Low": [98, 99], "Close": [101, 102]
+            OPEN_COLUMN: [100, 101], HIGH_COLUMN: [102, 103], 
+            LOW_COLUMN: [98, 99], CLOSE_COLUMN: [101, 102]
         }
         df = pd.DataFrame(data, index=pd.date_range("2025-01-01", periods=2))
 

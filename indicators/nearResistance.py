@@ -4,8 +4,11 @@ from .indicator import Indicator
 from indicators.constants import (
     CLOSE_COLUMN,
     HIGH_COLUMN,
+    OPERATION_TYPE,
+    RESISTANCE_LOOKBACK,
     SIGNAL_SELL,
-    SIGNAL_HOLD
+    SIGNAL_HOLD,
+    TOLERANCE_PCT
 )
 
 class NearResistance(Indicator):
@@ -25,10 +28,11 @@ class NearResistance(Indicator):
 
         # --- 1. Parameter Extraction ---
         try:
-            lookback = int(params.get('resistance_lookback', 20))
-            tolerance_pct = float(params.get('tolerance_pct', 0.5))
-            operation_type = params.get('operation_type', SIGNAL_SELL)
+            lookback = int(params.get(RESISTANCE_LOOKBACK, 20))
+            tolerance_pct = float(params.get(TOLERANCE_PCT, 0.5))
+            operation_type = int(params.get(OPERATION_TYPE, SIGNAL_SELL))
         except (ValueError, TypeError):
+            print("Invalid parameter types for NearResistance indicator.")
             return SIGNAL_HOLD
 
         # --- 2. Data Validation ---
@@ -49,6 +53,7 @@ class NearResistance(Indicator):
         diff_pct = (abs(current_price - resistance_level) / resistance_level) * 100
 
         if diff_pct <= tolerance_pct:
+            print(f'close value found in NearResistance indicator for level ${resistance_level} with tolerance {tolerance_pct}%')
             return operation_type
 
         return SIGNAL_HOLD

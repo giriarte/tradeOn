@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 import pandas as pd
-from indicators.constants import SIGNAL_BUY, SIGNAL_SELL, SIGNAL_HOLD
+from indicators.constants import CLOSE_COLUMN, HIGH_COLUMN, LOW_COLUMN, OPEN_COLUMN, SIGNAL_BUY, SIGNAL_SELL, SIGNAL_HOLD
 from indicators.engulfing import Engulfing
 
 class TestEngulfing(unittest.TestCase):
@@ -13,10 +13,10 @@ class TestEngulfing(unittest.TestCase):
         
         # Engulfing is a 2-candle pattern, so we provide at least 2 rows
         self.df = pd.DataFrame({
-            "Open": [100.0, 105.0],
-            "High": [106.0, 106.0],
-            "Low": [99.0, 94.0],
-            "Close": [104.0, 95.0]
+            OPEN_COLUMN: [100.0, 105.0],
+            HIGH_COLUMN: [106.0, 106.0],
+            LOW_COLUMN: [99.0, 94.0],
+            CLOSE_COLUMN: [104.0, 95.0]
         }, index=pd.date_range("2025-01-01", periods=2))
 
     @patch("pandas_ta.cdl_pattern")

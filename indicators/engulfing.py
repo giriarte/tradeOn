@@ -2,6 +2,10 @@ import pandas_ta as ta
 import typing as t
 
 from indicators.constants import ( 
+    CLOSE_COLUMN,
+    HIGH_COLUMN,
+    LOW_COLUMN,
+    OPEN_COLUMN,
     SIGNAL_BUY,
     SIGNAL_HOLD,
     SIGNAL_SELL
@@ -28,7 +32,7 @@ class Engulfing(Indicator):
 
         # Calculate Engulfing pattern using pandas_ta
         # This returns 100 for Bullish and -100 for Bearish
-        engulfing_series = ta.cdl_pattern(df["Open"], df["High"], df["Low"], df["Close"], name="engulfing")
+        engulfing_series = ta.cdl_pattern(df[OPEN_COLUMN], df[HIGH_COLUMN], df[LOW_COLUMN], df[CLOSE_COLUMN], name="engulfing")
         
         if engulfing_series is not None and not engulfing_series.empty:
             # Extract the last signal from the resulting DataFrame

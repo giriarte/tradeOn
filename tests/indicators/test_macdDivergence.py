@@ -2,6 +2,15 @@ import unittest
 from unittest.mock import patch
 import pandas as pd
 from indicators.constants import (
+    CLOSE_COLUMN,
+    HIGH_COLUMN,
+    LOOKBACK,
+    LOW_COLUMN,
+    MACD_FAST,
+    MACD_SIGNAL,
+    MACD_SLOW,
+    OPEN_COLUMN,
+    OPERATION_TYPE,
     SIGNAL_BUY, 
     SIGNAL_SELL
 )
@@ -40,16 +49,16 @@ class TestMACDDivergence(unittest.TestCase):
         low_values[-1] = 90.0                # Current Lower Low Price
 
         data = pd.DataFrame({
-            'Open':  [105.0] * total_rows,
-            'High':  [115.0] * total_rows,
-            'Low':   low_values,             # The 'Low' column for Bullish logic
-            'Close': [102.0] * total_rows
+            OPEN_COLUMN:  [105.0] * total_rows,
+            HIGH_COLUMN:  [115.0] * total_rows,
+            LOW_COLUMN:   low_values,             # The 'Low' column for Bullish logic
+            CLOSE_COLUMN: [102.0] * total_rows
         }, index=range(total_rows))
 
         params = {
-            'fast': 12, 'slow': slow, 'signal': 9,
-            'lookback': lookback, 
-            'operation_type': SIGNAL_BUY
+            MACD_FAST: 12, MACD_SLOW: slow, MACD_SIGNAL: 9,
+            LOOKBACK: lookback,
+            OPERATION_TYPE: SIGNAL_BUY
         }
 
         indicator = MACDDivergence(name="Div_Buy_Test", params=params)
@@ -78,16 +87,16 @@ class TestMACDDivergence(unittest.TestCase):
         # 2. Create Data with EVERY column to prevent KeyError
         # Note: We use the actual constants for the keys
         data = pd.DataFrame({
-            'Open':  [100.0] * total_rows,
-            'High':  [50.0] * (total_rows - 2) + [100.0, 110.0], # Highs: 100 -> 110
-            'Low':   [40.0] * total_rows,                        # The missing 'Low' column
-            'Close': [45.0] * (total_rows - 2) + [98.0, 108.0]
+            OPEN_COLUMN:  [100.0] * total_rows,
+            HIGH_COLUMN:  [50.0] * (total_rows - 2) + [100.0, 110.0], # Highs: 100 -> 110
+            LOW_COLUMN:   [40.0] * total_rows,                        # The missing 'Low' column
+            CLOSE_COLUMN: [45.0] * (total_rows - 2) + [98.0, 108.0]
         }, index=range(total_rows))
 
         params = {
-            'fast': 12, 'slow': slow, 'signal': 9,
-            'lookback': lookback, 
-            'operation_type': SIGNAL_SELL
+            MACD_FAST: 12, MACD_SLOW: slow, MACD_SIGNAL: 9,
+            LOOKBACK: lookback,
+            OPERATION_TYPE: SIGNAL_SELL
         }
 
         indicator = MACDDivergence(name="Div_Sell_Test", params=params)

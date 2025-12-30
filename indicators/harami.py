@@ -2,6 +2,10 @@ import pandas_ta as ta
 import typing as t
 
 from indicators.constants import ( 
+    CLOSE_COLUMN,
+    HIGH_COLUMN,
+    LOW_COLUMN,
+    OPEN_COLUMN,
     SIGNAL_BUY,
     SIGNAL_HOLD,
     SIGNAL_SELL
@@ -30,10 +34,10 @@ class Harami(Indicator):
         # Calculate Harami pattern using pandas_ta
         # Note: pandas_ta uses TA-Lib logic which returns 100 for Bullish and -100 for Bearish
         harami_series = ta.cdl_pattern(
-            df["Open"], 
-            df["High"], 
-            df["Low"], 
-            df["Close"], 
+            df[OPEN_COLUMN], 
+            df[HIGH_COLUMN], 
+            df[LOW_COLUMN], 
+            df[CLOSE_COLUMN], 
             name="harami"
         )
         

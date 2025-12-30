@@ -1,6 +1,6 @@
 import unittest
 import pandas as pd
-from indicators.constants import SIGNAL_BUY, CLOSE_COLUMN, LOW_COLUMN
+from indicators.constants import OPERATION_TYPE, SIGNAL_BUY, CLOSE_COLUMN, LOW_COLUMN, SUPPORT_LOOKBACK, TOLERANCE_PCT
 from indicators.nearSupport import NearSupport
 
 class TestNearSupport(unittest.TestCase):
@@ -16,9 +16,9 @@ class TestNearSupport(unittest.TestCase):
         })
         
         params = {
-            'support_lookback': 3, 
-            'tolerance_pct': 0.5, 
-            'operation_type': SIGNAL_BUY
+            SUPPORT_LOOKBACK: 3, 
+            TOLERANCE_PCT: 0.5, 
+            OPERATION_TYPE: SIGNAL_BUY
         }
         
         indicator = NearSupport(name="NearSupport_Test", params=params)
@@ -35,7 +35,7 @@ class TestNearSupport(unittest.TestCase):
             CLOSE_COLUMN: [102.0, 111.0, 100.1] # Current price 100.1 is near 100.0
         })
         
-        params = {'support_lookback': 2, 'tolerance_pct': 0.5}
+        params = {SUPPORT_LOOKBACK: 2, TOLERANCE_PCT: 0.5}
         indicator = NearSupport(name="NearSupport_Test", params=params)
         
         self.assertEqual(indicator.evaluate(data), SIGNAL_BUY)

@@ -34,7 +34,7 @@ class MACDCross(Indicator):
             fast = int(params.get(MACD_FAST, 12))
             slow = int(params.get(MACD_SLOW, 26))
             signal_period = int(params.get(MACD_SIGNAL, 9))
-            operation_type = params.get(OPERATION_TYPE, SIGNAL_BUY)
+            operation_type = int(params.get(OPERATION_TYPE, SIGNAL_BUY))
         except (ValueError, TypeError):
             print("Invalid parameter types for MACDCross indicator.")
             return SIGNAL_HOLD

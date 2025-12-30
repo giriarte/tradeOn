@@ -2,6 +2,10 @@ import pandas_ta as ta
 import typing as t
 
 from indicators.constants import ( 
+    CLOSE_COLUMN,
+    HIGH_COLUMN,
+    LOW_COLUMN,
+    OPEN_COLUMN,
     SIGNAL_BUY,
     SIGNAL_HOLD
 )
@@ -30,10 +34,10 @@ class DragonflyDoji(Indicator):
         # Calculate Dragonfly Doji pattern using pandas_ta
         # Returns 100 when detected
         doji_series = ta.cdl_pattern(
-            df["Open"], 
-            df["High"], 
-            df["Low"], 
-            df["Close"], 
+            df[OPEN_COLUMN], 
+            df[HIGH_COLUMN], 
+            df[LOW_COLUMN], 
+            df[CLOSE_COLUMN], 
             name="dragonflydoji"
         )
         

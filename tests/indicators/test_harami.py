@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 import pandas as pd
-from indicators.constants import SIGNAL_BUY, SIGNAL_SELL, SIGNAL_HOLD
+from indicators.constants import CLOSE_COLUMN, HIGH_COLUMN, LOW_COLUMN, OPEN_COLUMN, SIGNAL_BUY, SIGNAL_SELL, SIGNAL_HOLD
 from indicators.harami import Harami
 
 class TestHarami(unittest.TestCase):
@@ -13,10 +13,10 @@ class TestHarami(unittest.TestCase):
         
         # Harami is a two-candle pattern (Mother and Baby)
         self.df = pd.DataFrame({
-            "Open":  [100.0, 102.0],
-            "High":  [105.0, 104.0],
-            "Low":   [95.0,  96.0],
-            "Close": [96.0,  103.0]
+            OPEN_COLUMN:  [100.0, 102.0],
+            HIGH_COLUMN:  [105.0, 104.0],
+            LOW_COLUMN:   [95.0,  96.0],
+            CLOSE_COLUMN: [96.0,  103.0]
         }, index=pd.date_range("2025-01-01", periods=2))
 
     @patch("pandas_ta.cdl_pattern")

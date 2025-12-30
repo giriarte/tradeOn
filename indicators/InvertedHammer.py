@@ -2,6 +2,10 @@ import pandas_ta as ta
 import typing as t
 
 from indicators.constants import ( 
+    CLOSE_COLUMN,
+    HIGH_COLUMN,
+    LOW_COLUMN,
+    OPEN_COLUMN,
     SIGNAL_BUY,
     SIGNAL_HOLD
 )
@@ -28,10 +32,10 @@ class InvertedHammer(Indicator):
 
         # Calculate Inverted Hammer pattern using pandas_ta
         inv_hammer_series = ta.cdl_pattern(
-            df["Open"], 
-            df["High"], 
-            df["Low"], 
-            df["Close"], 
+            df[OPEN_COLUMN], 
+            df[HIGH_COLUMN], 
+            df[LOW_COLUMN], 
+            df[CLOSE_COLUMN], 
             name="invertedhammer"
         )
         
@@ -42,8 +46,8 @@ class InvertedHammer(Indicator):
             # Check if the pattern was found (100)
             if last_signal == 100:
                 # Extract OHLC for the most recent candle
-                last_open = df["Open"].iloc[-1]
-                last_close = df["Close"].iloc[-1]
+                last_open = df[OPEN_COLUMN].iloc[-1]
+                last_close = df[CLOSE_COLUMN].iloc[-1]
                 
                 # Filter: Only accept the signal if the candle is green
                 if last_close > last_open:

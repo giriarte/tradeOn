@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 import pandas as pd
-from indicators.constants import SIGNAL_BUY, SIGNAL_HOLD, CLOSE_COLUMN
+from indicators.constants import EMA_LENGTH, OPERATION_TYPE, SIGNAL_BUY, SIGNAL_HOLD, CLOSE_COLUMN, TOLERANCE_PCT
 from indicators.nearEma import NearEMA
 
 class TestNearEMA(unittest.TestCase):
@@ -14,9 +14,9 @@ class TestNearEMA(unittest.TestCase):
         
         data = pd.DataFrame({CLOSE_COLUMN: [100.2] * 20})
         params = {
-            'ema_length': 20, 
-            'tolerance_pct': 0.5, 
-            'operation_type': SIGNAL_BUY
+            EMA_LENGTH: 20, 
+            TOLERANCE_PCT: 0.5, 
+            OPERATION_TYPE: SIGNAL_BUY
         }
         
         indicator = NearEMA(name="NearEMA_Test", params=params)
@@ -28,7 +28,7 @@ class TestNearEMA(unittest.TestCase):
         mock_ema.return_value = pd.Series([100.0] * 20)
         
         data = pd.DataFrame({CLOSE_COLUMN: [102.0] * 20})
-        params = {'ema_length': 20, 'tolerance_pct': 0.5}
+        params = {EMA_LENGTH: 20, TOLERANCE_PCT: 0.5}
         
         indicator = NearEMA(name="NearEMA_Test", params=params)
         self.assertEqual(indicator.evaluate(data), SIGNAL_HOLD)

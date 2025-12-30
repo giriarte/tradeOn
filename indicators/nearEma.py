@@ -4,8 +4,11 @@ import typing as t
 from .indicator import Indicator
 from indicators.constants import (
     CLOSE_COLUMN,
+    EMA_LENGTH,
+    OPERATION_TYPE,
     SIGNAL_BUY,
-    SIGNAL_HOLD
+    SIGNAL_HOLD,
+    TOLERANCE_PCT
 )
 
 class NearEMA(Indicator):
@@ -25,9 +28,9 @@ class NearEMA(Indicator):
 
         # --- 1. Parameter Extraction ---
         try:
-            ema_length = int(params.get('ema_length', 20))
-            tolerance_pct = float(params.get('tolerance_pct', 0.5))
-            operation_type = params.get('operation_type', SIGNAL_BUY)
+            ema_length = int(params.get(EMA_LENGTH, 20))
+            tolerance_pct = float(params.get(TOLERANCE_PCT, 0.5))
+            operation_type = params.get(OPERATION_TYPE, SIGNAL_BUY)
         except (ValueError, TypeError):
             print("Invalid parameters for NearEMA indicator.")
             return SIGNAL_HOLD

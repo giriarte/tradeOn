@@ -4,8 +4,11 @@ from .indicator import Indicator
 from indicators.constants import (
     CLOSE_COLUMN,
     LOW_COLUMN,
+    OPERATION_TYPE,
     SIGNAL_BUY,
-    SIGNAL_HOLD
+    SIGNAL_HOLD,
+    SUPPORT_LOOKBACK,
+    TOLERANCE_PCT
 )
 
 class NearSupport(Indicator):
@@ -25,9 +28,9 @@ class NearSupport(Indicator):
 
         # --- 1. Parameter Extraction ---
         try:
-            lookback = int(params.get('support_lookback', 20))
-            tolerance_pct = float(params.get('tolerance_pct', 0.5))
-            operation_type = params.get('operation_type', SIGNAL_BUY)
+            lookback = int(params.get(SUPPORT_LOOKBACK, 20))
+            tolerance_pct = float(params.get(TOLERANCE_PCT, 0.5))
+            operation_type = int(params.get(OPERATION_TYPE, SIGNAL_BUY))
         except (ValueError, TypeError):
             print("Invalid parameter types for NearSupport indicator.")
             return SIGNAL_HOLD
@@ -51,6 +54,7 @@ class NearSupport(Indicator):
         diff_pct = (abs(current_price - support_level) / support_level) * 100
 
         if diff_pct <= tolerance_pct:
+            print(f'close value found in NearSupport indicator for level ${support_level} with tolerance {tolerance_pct}%')
             return operation_type
 
         return SIGNAL_HOLD
