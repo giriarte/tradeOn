@@ -97,8 +97,8 @@ class ThreeGreenCandlesRsi(TradeStrategy):
     # Lists of Indicators
     baseIndicators: t.List[Indicator] = [
         # NGreenCandles("NGreenCandles", defaultParams.get("NGreenCandles", {})),
-        # RSI("RSI", defaultParams.get("RSI", {}))
-        DMNRange("DMNRange", defaultParams.get("DMNRange", {}))
+        RSI("RSI", defaultParams.get("RSI", {})),
+        NearEMA("NearEMA", defaultParams.get("NearEMA", {}), 3)
     ] # Indicators here are mandatory conditions to generate a position
 
     enhancers: t.List[Indicator] = [] # Enhancers indicators can increase the position category

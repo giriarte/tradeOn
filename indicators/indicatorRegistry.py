@@ -75,7 +75,7 @@ INDICATOR_MAP = {
     "DMNRange": DMNRange
 }
 
-def get_indicator_instance(name: str, all_params: dict) -> Indicator:
+def get_indicator_instance(name: str, all_params: dict, offset: int | None) -> Indicator:
     indicator_class = INDICATOR_MAP.get(name)
     if not indicator_class:
         raise ValueError(f"Indicator implementation for '{name}' not found.")
@@ -84,4 +84,4 @@ def get_indicator_instance(name: str, all_params: dict) -> Indicator:
     specific_params = all_params.get(name, {})
     
     print(f"Creating indicator '{name}' with params: {specific_params}")
-    return indicator_class(name=name, params=specific_params)
+    return indicator_class(name=name, params=specific_params, offset=offset)

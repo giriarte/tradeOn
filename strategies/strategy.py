@@ -67,7 +67,11 @@ class TradeStrategy:
         for indicator in self.baseIndicators:
             # Call the indicator's evaluate method, passing data and parameters
             # The indicator must return an integer signal (0, 1, 2)
-            signal = indicator.evaluate(data, params)
+            # We also need to consider the offset if defined
+            offset = indicator.offset if indicator.offset is not None else 0
+            end_index = int(len(data)-offset) if len(data)-offset > 0 else len(data)
+            evaluation_data = data.iloc[0:end_index]
+            signal = indicator.evaluate(evaluation_data, params)
             signals.append(signal)
 
         # 3. Check for the required conditions

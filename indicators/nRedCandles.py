@@ -43,12 +43,12 @@ class NRedCandles(Indicator):
         N = default_n
         
         if params and N_CANDLES_LENGTH in params:
-            N = params[N_CANDLES_LENGTH]
+            N = int(params[N_CANDLES_LENGTH])
             
         if params and N_CANDLES_OPERATION in params:
-            n_candles_operation = params[N_CANDLES_OPERATION]
+            n_candles_operation = int(params[N_CANDLES_OPERATION])
         
-        Y = params.get(N_CANDLES_OFFSET, 0)  # Offset (e.g., 0 for current, 2 for two periods ago)
+        Y = int(params.get(N_CANDLES_OFFSET, 0))  # Offset (e.g., 0 for current, 2 for two periods ago)
 
         # 2. Data Validation
         if not isinstance(data, pd.DataFrame) or len(data) < N:

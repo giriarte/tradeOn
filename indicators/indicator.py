@@ -10,10 +10,12 @@ class Indicator(ABC):
     # --- ATTRIBUTES (Class Variables or Properties for definition) ---
     name: str = ""
     params: t.Dict[str, t.Any] = {}
+    offset: int
 
-    def __init__(self, name: str, params: t.Dict[str, t.Any] = None):
+    def __init__(self, name: str, params: t.Dict[str, t.Any] = None, offset: int = None):
         self.name = name
         self.params = params if params is not None else {}
+        self.offset = offset if offset is not None else 0
 
     # --- ABSTRACT METHOD ---
 

@@ -17,9 +17,11 @@ def create_strategy(item: dict) -> TradeStrategy:
         # asset=pos_data.get('asset', '')
     )
 
-    # 2. Convert Indicator names to Concrete Objects
-    indicator_names = item.get('baseIndicators', [])
-    base_indicators = [get_indicator_instance(name, item.get('defaultParams', {})) for name in indicator_names]
+    # Convert Indicator names to Concrete Objects
+    # Access the raw list from the DynamoDB item (now a list of dicts/maps)
+    # Structure expected: [{'name': 'EMACross', 'offset': 5}, {'name': 'ADXRange'}]
+    raw_indicator_data = item.get('baseIndicators', [])
+    base_indicators = [get_indicator_instance(entry.get('name'), item.get('defaultParams', {}), entry.get('offset')) for entry in raw_indicator_data]
 
     # 3. Build the TradeStrategy
     return TradeStrategy(
