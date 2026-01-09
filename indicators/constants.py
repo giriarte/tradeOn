@@ -25,6 +25,7 @@ N_CANDLES_OFFSET = 'n_candles_offset'
 EMA_LENGTH = 'ema_length'
 DISTANCE_PCT_CAP = 'distance_pct_cap'
 MIN_SLOPE_PCT = 'min_slope_pct'
+MIN_RAW_SLOPE_PCT = 'min_raw_slope_pct'
 EMA_HIGH = 'ema_high'
 EMA_LOW = 'ema_low'
 

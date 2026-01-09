@@ -29,7 +29,7 @@ class PriceAboveBollingerBand(Indicator):
         try:
             length = int(params.get(BB_LENGTH, 20))
             std = float(params.get(BB_STD, 2.0))
-            operation_type = params.get(OPERATION_TYPE, SIGNAL_SELL)
+            operation_type = int(params.get(OPERATION_TYPE, SIGNAL_SELL))
         except (ValueError, TypeError):
             return SIGNAL_HOLD
 

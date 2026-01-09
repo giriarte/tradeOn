@@ -65,13 +65,13 @@ class MACDCross(Indicator):
         # --- 4. Crossover Logic ---
         if operation_type == SIGNAL_BUY:
             # Bullish Cross: MACD was below Signal and is now above
-            if prev_macd <= prev_signal and curr_macd > curr_signal:
+            if prev_macd <= prev_signal and curr_macd > curr_signal and curr_macd < 0:
                 print("MACD crossed above Signal line.")
                 return SIGNAL_BUY
                 
         elif operation_type == SIGNAL_SELL:
             # Bearish Cross: MACD was above Signal and is now below
-            if prev_macd >= prev_signal and curr_macd < curr_signal:
+            if prev_macd >= prev_signal and curr_macd < curr_signal and curr_macd > 0:
                 print("MACD crossed below Signal line.")
                 return SIGNAL_SELL
 

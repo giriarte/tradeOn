@@ -15,8 +15,8 @@ class BearishCandlePattern(Indicator):
     It returns SIGNAL_SELL if any of the underlying indicators detect a pattern.
     """
 
-    def __init__(self, name: str, params: t.Dict[str, t.Any] = None):
-        super().__init__(name, params)
+    def __init__(self, name: str, params: t.Dict[str, t.Any] = None, offset: int = None):
+        super().__init__(name, params, offset)
         # Initialize the subset of bearish indicators
         self.bearish_indicators = [
             Engulfing("Engulfing", params),

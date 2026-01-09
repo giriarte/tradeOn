@@ -1,7 +1,9 @@
 import typing as t
 from indicators.InvertedHammer import InvertedHammer
+from indicators.aboveEMA import AboveEMA
 from indicators.adxRange import ADXRange
 from indicators.bearishCandlePattern import BearishCandlePattern
+from indicators.belowEMA import BelowEMA
 from indicators.bollingerBandReEntry import BollingerBandReEntry
 from indicators.bollingerBandWidth import BollingerBandWidth
 from indicators.bullishCandlePattern import BullishCandlePattern
@@ -9,6 +11,7 @@ from indicators.closePrice import ClosePrice
 from indicators.constants import (
     DISTANCE_PCT_CAP,
     EMA_LENGTH,
+    MIN_RAW_SLOPE_PCT,
     N_CANDLES_LENGTH,
     N_CANDLES_OFFSET,
     N_CANDLES_OPERATION,
@@ -35,8 +38,12 @@ from indicators.macdCross import MACDCross
 from indicators.macdDivergence import MACDDivergence
 from indicators.morningStar import MorningStar
 from indicators.nGreenCandles import NGreenCandles
+from indicators.nRedCandles import NRedCandles
 from indicators.nearEma import NearEMA
+from indicators.nearResistance import NearResistance
 from indicators.nearSupport import NearSupport
+from indicators.priceAboveBollingerBand import PriceAboveBollingerBand
+from indicators.priceBelowBolingerBand import PriceBelowBollingerBand
 from indicators.rsi import RSI
 from indicators.shootingStar import ShootingStar
 from indicators.stochasticRSICross import StochasticRSICross
@@ -46,12 +53,12 @@ from strategies.strategy import TradeStrategy, Position
 Dictionary = t.Dict[str, t.Dict[str, t.Any]] # Represents the default parameters map
 
 class ThreeGreenCandlesRsi(TradeStrategy):
-    rsiLength = 10
+    rsiLength = 26
     rsiBuyThreshold = 30
     rsiSellThreshold = 70
     nCandlesLength = 3
     nCandlesOperation = 2
-    nCandlesOffset = 1
+    nCandlesOffset = 0
 
     # --- ATTRIBUTES (Class Variables or Properties for definition) ---
     name: str = 'ThreeGreenCandlesRsi'
@@ -60,45 +67,82 @@ class ThreeGreenCandlesRsi(TradeStrategy):
         "RSI": {
                 RSI_LENGTH: rsiLength,
                 RSI_BUY_THRESHOLD: rsiBuyThreshold,
-                RSI_SELL_THRESHOLD: rsiSellThreshold
+                RSI_SELL_THRESHOLD: rsiSellThreshold,
+                OPERATION_TYPE: 2,
             },
-        "NGreenCandles": {
-            N_CANDLES_LENGTH: nCandlesLength,
-            N_CANDLES_OPERATION: nCandlesOperation,
-            N_CANDLES_OFFSET: nCandlesOffset
+        "NRedCandles": {
+            N_CANDLES_LENGTH: 3,
+            N_CANDLES_OPERATION: 1,
+            N_CANDLES_OFFSET: 0
         },
-        "Doji": {
-            OPERATION_TYPE: 2
+        "StochasticRSICross": {
+            OPERATION_TYPE: 1,
+            "threshold": 20
         },
-        "EMADistanceCap": {
+        "NearEMA": {
             EMA_LENGTH: 50,
-            DISTANCE_PCT_CAP: 0.05
+            DISTANCE_PCT_CAP: 0.05,
+            OPERATION_TYPE: 1
         },
-        "BollingerBandWidth": {
-            "bb_variation_min": 7.0
+        "MACDDivergence": {
+            "bb_variation_min": 4.0,
+            OPERATION_TYPE: 1
         },
         "NearSupport": {
             "support_lookback": 100,
             "tolerance_pct": 0.4,
             OPERATION_TYPE: 1
         },
-        "NearEMA": {
-            "ema_length": 50, 
-            "tolerance_pct": 0.05,
-            OPERATION_TYPE: 1
+        "BelowEMA": {
+            "ema_length": 200, 
+            OPERATION_TYPE: 2
         },
         "DMNRange": {
-            "dmn_min": 20.0,
-            "dmn_max": 35.0,
+            "dmn_min": 0.01,
+            OPERATION_TYPE: 2
+        },
+        "DMPRange": {
+            "dmp_max": 0.01,
+            OPERATION_TYPE: 2
+        },
+        "BollingerBandReEntry": {
+            OPERATION_TYPE: 1,
+            'bb_length': 26
+        },
+        "EMASlope": {
+            OPERATION_TYPE: 1,
+            "lookback": 100,
+            "ema_length": 50,
+            MIN_RAW_SLOPE_PCT: 0.7
+        },
+        "AboveEMA": {
+            "ema_length": 200,
             OPERATION_TYPE: 1
+        },
+        "BearishCandlePattern": {
+            OPERATION_TYPE: 1
+        },
+        "ADXRange": {
+            "adx_min": 25,
+            OPERATION_TYPE: 1
+        },
+        "MACDCross": {
+            OPERATION_TYPE: 1
+        },
+        "EMACross": {
+            OPERATION_TYPE: 1,
+            "ema_low": 21,
+            "ema_high": 55
         }
     } # Inidicators parameters
 
     # Lists of Indicators
     baseIndicators: t.List[Indicator] = [
         # NGreenCandles("NGreenCandles", defaultParams.get("NGreenCandles", {})),
-        RSI("RSI", defaultParams.get("RSI", {})),
-        NearEMA("NearEMA", defaultParams.get("NearEMA", {}), 3)
+        # BollingerBandWidth("BollingerBandWidth", defaultParams.get("BollingerBandWidth", {}), 0),
+        # BullishCandlePattern("BullishCandlePattern", defaultParams.get("BullishCandlePattern", {}), 0),
+        EMACross("EMACross", defaultParams.get("EMACross", {}), 4),
+        BearishCandlePattern("BearishCandlePattern", defaultParams.get("BearishCandlePattern", {}), 0),
     ] # Indicators here are mandatory conditions to generate a position
 
     enhancers: t.List[Indicator] = [] # Enhancers indicators can increase the position category

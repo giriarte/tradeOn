@@ -1,9 +1,11 @@
 import yfinance as yf
+import ccxt
 import sys
 import os
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import numpy as np
+import pandas as pd
 import boto3
 from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key
@@ -53,8 +55,8 @@ def plot_with_signal(dfpl):
     
     # --- 1. Indicator Calculations ---
     # EMAs
-    dfpl['EMA_9'] = ta.ema(dfpl[CLOSE_COLUMN], length=15)
-    dfpl['EMA_21'] = ta.ema(dfpl[CLOSE_COLUMN], length=50)
+    dfpl['EMA_21'] = ta.ema(dfpl[CLOSE_COLUMN], length=21)
+    dfpl['EMA_50'] = ta.ema(dfpl[CLOSE_COLUMN], length=50)
     
     # Bollinger Bands
     bb_len, bb_std = 20, 2.0
@@ -90,8 +92,8 @@ def plot_with_signal(dfpl):
     # Overlays
     fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['BBU'], line=dict(color="#084248"), name="BBU"), row=1, col=1)
     fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['BBL'], line=dict(color='#084248'), fill='tonexty', name="BBL"), row=1, col=1)
-    fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['EMA_9'], line=dict(color='orange', width=1), name="EMA 9"), row=1, col=1)
-    fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['EMA_21'], line=dict(color='yellow', width=1), name="EMA 21"), row=1, col=1)
+    fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['EMA_21'], line=dict(color='orange', width=1), name="EMA 21"), row=1, col=1)
+    fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['EMA_50'], line=dict(color='yellow', width=1), name="EMA 50"), row=1, col=1)
     fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['pointpos'], mode="markers", 
                              marker=dict(size=10, color="MediumPurple", symbol="diamond"), name="Signal"), row=1, col=1)
 
@@ -99,16 +101,16 @@ def plot_with_signal(dfpl):
     fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['MACD'], line=dict(color='#00E6FF', width=1.5), name="MACD"), row=2, col=1)
     fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['MACD_S'], line=dict(color='#FF00FF', width=1.5), name="Signal Line"), row=2, col=1)
     
-    colors = ['#26A69A' if val >= 0 else '#EF5350' for val in dfpl['MACD_H']]
-    fig.add_trace(go.Bar(x=dfpl.index, y=dfpl['MACD_H'], marker_color=colors, name="Histogram"), row=2, col=1)
+    # colors = ['#26A69A' if val >= 0 else '#EF5350' for val in dfpl['MACD_H']]
+    # fig.add_trace(go.Bar(x=dfpl.index, y=dfpl['MACD_H'], marker_color=colors, name="Histogram"), row=2, col=1)
 
-    # --- ROW 3: Stochastic RSI ---
-    fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['STOCH_K'], line=dict(color='white', width=1.2), name="Stoch %K"), row=3, col=1)
-    fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['STOCH_D'], line=dict(color='yellow', width=1.2, dash='dot'), name="Stoch %D"), row=3, col=1)
+    # # --- ROW 3: Stochastic RSI ---
+    # fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['STOCH_K'], line=dict(color='white', width=1.2), name="Stoch %K"), row=3, col=1)
+    # fig.add_trace(go.Scatter(x=dfpl.index, y=dfpl['STOCH_D'], line=dict(color='yellow', width=1.2, dash='dot'), name="Stoch %D"), row=3, col=1)
 
-    # Add Threshold Lines for Stoch RSI
-    fig.add_hline(y=80, line_dash="dash", line_color="red", line_width=1, row=3, col=1)
-    fig.add_hline(y=20, line_dash="dash", line_color="green", line_width=1, row=3, col=1)
+    # # Add Threshold Lines for Stoch RSI
+    # fig.add_hline(y=80, line_dash="dash", line_color="red", line_width=1, row=3, col=1)
+    # fig.add_hline(y=20, line_dash="dash", line_color="green", line_width=1, row=3, col=1)
 
     # --- 3. Layout & Range Slider ---
     fig.update_layout(
@@ -129,6 +131,23 @@ def plotResults(data):
     data['pointpos'] = data.apply(lambda row: pointpos(row, "strategy_output"), axis=1)
     plot_with_signal(data)
 
+def download_binance_data(symbol='BNB/USDT:USDT', timeframe='5m', limit=1440):
+    # Initialize Binance exchange
+    exchange = ccxt.binanceusdm()
+
+    # Fetch OHLCV (Open, High, Low, Close, Volume) data
+    # limit=1440 at 5m intervals covers roughly 5 days (1440 * 5 mins / 60 mins = 120 hours)
+    ohlcv = exchange.fetch_ohlcv(symbol, timeframe=timeframe, limit=limit)
+
+    # Convert to DataFrame
+    df = pd.DataFrame(ohlcv, columns=['Timestamp', 'Open', 'High', 'Low', 'Close', 'Volume'])
+
+    # Format the timestamp to match yfinance style
+    df['Timestamp'] = pd.to_datetime(df['Timestamp'], unit='ms')
+    df.set_index('Timestamp', inplace=True)
+    
+    return df
+
 # ====================================================================
 # --- NEW: Main Logic Function ---
 # ====================================================================
@@ -142,10 +161,9 @@ def invoke(event, context):
     testMode = event.get('testMode')
 
     # Data Download and Cleanup
-    print("Downloading data...")
-    raw_data = yf.download(tickers='BTC-USD', period='1y', interval='1d')
+    # raw_data = yf.download(tickers='BTC-USD', period='5d', interval='5m') // This is the yfinance version...
     # Clean up column names (e.g., ('Close', '') -> 'Close')
-    raw_data.columns = [col[0] if isinstance(col, tuple) else col for col in raw_data.columns]
+    # raw_data.columns = [col[0] if isinstance(col, tuple) else col for col in raw_data.columns]
 
     if not email or not user_id:
         return {"statusCode": 400, "body": "Missing email or userId in payload"}
@@ -168,58 +186,107 @@ def invoke(event, context):
 
     if testMode:
         print("Running in test mode...")
-        doTestMode(raw_data, trade_strategies)
+        doTestMode([], trade_strategies)
         return {"statusCode": 200, "body": "Test mode execution complete."}
 
     # Real flow, in case testMode is not active...
     for strategy in trade_strategies:
-        # raw_data[0:141] is to force generate a signal. Replace it with raw_data for full dataset
-        strategy_position_output = strategy.evaluate(raw_data[0:141], None)
-        
-        if strategy_position_output:
-            alert_message = f"Strategy {strategy.name} generated a signal: {strategy_position_output.type}"
-            print(alert_message)
-            
-            try:
-                # Publish to the SNS Topic
-                response = sns_client.publish(
-                    TopicArn=TOPIC_ARN,
-                    Message=alert_message,
-                    Subject=f"Trading Alert: {strategy.name}"
-                )
-                print(f"Notification sent! Message ID: {response['MessageId']}")
-                
-            except ClientError as e:
-                print(f"Failed to send notification: {e.response['Error']['Message']}")
+        for symbol in strategy.symbols:
+            # raw_data[0:141] is to force generate a signal. Replace it with raw_data for full dataset
+            # strategy_position_output = strategy.evaluate(raw_data[0:141], None)
 
-        else:
-            print(f"Strategy {strategy.name} did not generate any signal.")
+            print("Downloading data...")
+            # raw_data = yf.download(tickers='BTC-USD', period='5d', interval='5m') // This is the yfinance version...
+            raw_data = download_binance_data(symbol=symbol, timeframe='5m')
+            strategy_position_output = strategy.evaluate(raw_data, None)
+            if strategy_position_output:
+                alert_message = f"Strategy {strategy.name} generated a signal: {strategy_position_output.type} for symbol: {symbol}"
+                print(alert_message)
+
+                try:
+                    # Publish to the SNS Topic
+                    response = sns_client.publish(
+                        TopicArn=TOPIC_ARN,
+                        Message=alert_message,
+                        Subject=f"Trading Alert: {strategy.name}"
+                    )
+                    print(f"Notification sent! Message ID: {response['MessageId']}")
+                    
+                except ClientError as e:
+                    print(f"Failed to send notification: {e.response['Error']['Message']}")
+
+            else:
+                print(f"Strategy {strategy.name} did not generate any signal for symbol: {symbol}")
 
 
 def doTestMode(raw_data, trade_strategies):
     for strategy in trade_strategies:
-        strategy_output = [0] * len(raw_data)
-        for i in range(0, len(raw_data)):
-            # Pass the data up to the current bar
-            df = raw_data.iloc[0:i] 
-            
-            strategy_position_output = strategy.evaluate(df, None)
-            
-            if strategy_position_output:
-                # Store the type (e.g., 1 for Buy, 2 for Sell)
-                strategy_output[i] = strategy_position_output.type
-                print(f"Index {i}: Strategy {strategy.name} generated signal {strategy_position_output.type}")
-            else:
-                strategy_output[i] = 0 # Use 0 instead of None for easier plotting/analysis
-                
-        raw_data["strategy_output"] = strategy_output
-        print("Single stratey test complete.")
+        evaluateStrategyInTestMode(strategy)
 
-        # 5. Plotting Results
-        if should_plot:
-            print("Plotting results...")
-            plotResults(raw_data)
-        print(raw_data)
+def evaluateStrategyInTestMode(strategy):
+    data_path = os.path.abspath('tests\\historicalData5m\\crypto')
+        
+    if not os.path.isdir(data_path):
+        raise FileNotFoundError(f"Directory not found: {data_path}")
+
+    result_summary = []
+
+    for filename in os.listdir(data_path):
+        # Check if the file ends with .csv
+        if filename.endswith('.csv'):
+            file_path = os.path.join(data_path, filename)
+            
+            print(f"Reading file: {filename}")
+
+            raw_data = pd.read_csv(file_path, index_col=0, parse_dates=True)
+            raw_data.index = pd.to_datetime(raw_data.index, format="%d.%m.%Y %H:%M:%S.%f")
+            raw_data['Open'] = pd.to_numeric(raw_data['Open'], errors='coerce')
+            raw_data['Close'] = pd.to_numeric(raw_data['Close'], errors='coerce')
+            raw_data['High'] = pd.to_numeric(raw_data['High'], errors='coerce')
+            raw_data['Low'] = pd.to_numeric(raw_data['Low'], errors='coerce')
+        
+            # Drop rows where the values failed to convert (was a bad string)
+            raw_data.dropna(subset=['Open'], inplace=True)
+            raw_data.dropna(subset=['Close'], inplace=True)
+            raw_data.dropna(subset=['High'], inplace=True)
+            raw_data.dropna(subset=['Low'], inplace=True)
+
+            print(f"read {len(raw_data)} rows.")
+
+            # raw_data = yf.download(tickers='BTC-USD', period='1y', interval='1d')
+            # raw_data.columns = [col[0] for col in raw_data.columns]
+        
+            # Uncomment this line to visualize the results properly. Plot library will not produce expected results for more than 10000 rows.
+            raw_data = raw_data[0 : 1000]
+
+            evaluateStrategyInTestModeForSingleRawData(strategy, raw_data)
+
+
+
+def evaluateStrategyInTestModeForSingleRawData(strategy, raw_data):
+    strategy_output = [0] * len(raw_data)
+    for i in range(0, len(raw_data)):
+        # Pass the data up to the current bar
+        df = raw_data.iloc[0:i] 
+            
+        strategy_position_output = strategy.evaluate(df, None)
+            
+        if strategy_position_output:
+            # Store the type (e.g., 1 for Buy, 2 for Sell)
+            strategy_output[i] = strategy_position_output.type
+            print(f"Index {i}: Strategy {strategy.name} generated signal {strategy_position_output.type}")
+        else:
+            strategy_output[i] = 0 # Use 0 instead of None for easier plotting/analysis
+                
+    raw_data["strategy_output"] = strategy_output
+
+    # 5. Plotting Results
+    if should_plot:
+        print("Plotting results...")
+        plotResults(raw_data)
+    print(raw_data)
+
+    print(f'Single strategy complete for strategy name {strategy.name}')
 
 
 
@@ -259,7 +326,7 @@ def getUserDetails(email, user_id):
 
 user_payload = {
     "email": "a.g.iriarte@gmail.com",
-    "userId": "12345",
+    "userId": "12344",
     "testMode": True
 }
 

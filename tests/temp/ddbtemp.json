@@ -1,0 +1,235 @@
+{
+  "userId": {
+    "S": "12344"
+  },
+  "strategyId": {
+    "S": "bollingerUptrendContinuationBuy"
+  },
+  "baseIndicators": {
+    "L": [
+      {
+        "M": {
+          "name": {
+            "S": "AboveEMA"
+          },
+          "offset": {
+            "N": "10"
+          }
+        }
+      },
+      {
+        "M": {
+          "name": {
+            "S": "EMASlope"
+          },
+          "offset": {
+            "N": "0"
+          }
+        }
+      },
+      {
+        "M": {
+          "name": {
+            "S": "PriceBelowBollingerBand"
+          },
+          "offset": {
+            "N": "1"
+          }
+        }
+      }
+    ]
+  },
+  "brokerId": {
+    "S": "BINANCE_001"
+  },
+  "candleInterval": {
+    "S": "1h"
+  },
+  "categoryAPosition": {
+    "M": {
+      "action": {
+        "S": "BUY"
+      },
+      "asset": {
+        "S": "USDT"
+      },
+      "cost": {
+        "N": "1000"
+      },
+      "leverage": {
+        "N": "5"
+      },
+      "stopLoss": {
+        "N": "0.05"
+      },
+      "takeProfit": {
+        "N": "0.15"
+      },
+      "trailingStopIncreaseRatio": {
+        "N": "0.02"
+      },
+      "type": {
+        "N": "2"
+      }
+    }
+  },
+  "defaultParams": {
+    "M": {
+      "BearishCandlePattern": {
+        "M": {
+          "operation_type": {
+            "S": "2"
+          }
+        }
+      },
+      "AboveEMA": {
+        "M": {
+          "ema_length": {
+            "S": "90"
+          },
+          "operation_type": {
+            "S": "1"
+          }
+        }
+      },
+      "BollingerBandReEntry": {
+        "M": {
+          "bb_length": {
+            "S": "26"
+          },
+          "operation_type": {
+            "S": "1"
+          }
+        }
+      },
+      "BollingerBandWidth": {
+        "M": {
+          "bb_variation_min": {
+            "S": "15.0"
+          }
+        }
+      },
+      "ClosePrice": {
+        "M": {
+          "operation_type": {
+            "S": "2"
+          },
+          "target_level": {
+            "S": "80641"
+          },
+          "tolerance_pct": {
+            "S": "0.5"
+          }
+        }
+      },
+      "Doji": {
+        "M": {
+          "operation_type": {
+            "S": "2"
+          }
+        }
+      },
+      "EMACross": {
+        "M": {
+          "ema_high": {
+            "S": "50"
+          },
+          "ema_low": {
+            "S": "15"
+          },
+          "operation_type": {
+            "S": "2"
+          }
+        }
+      },
+      "EMADistanceCap": {
+        "M": {
+          "distance_pct_cap": {
+            "N": "0.2"
+          },
+          "ema_length": {
+            "N": "20"
+          }
+        }
+      },
+      "EMASlope": {
+        "M": {
+          "ema_length": {
+            "S": "50"
+          },
+          "lookback": {
+            "S": "100"
+          },
+          "min_raw_slope_pct": {
+            "S": "0.7"
+          },
+          "operation_type": {
+            "S": "1"
+          }
+        }
+      },
+      "NearEMA": {
+        "M": {
+          "ema_length": {
+            "S": "25"
+          },
+          "operation_type": {
+            "S": "1"
+          },
+          "tolerance_pct": {
+            "S": "0.2"
+          }
+        }
+      },
+      "NRedCandles": {
+        "M": {
+          "n_candles_length": {
+            "S": "1"
+          },
+          "n_candles_offset": {
+            "S": "0"
+          },
+          "n_candles_operation": {
+            "S": "2"
+          }
+        }
+      },
+      "PriceBelowBollingerBand": {
+        "M": {
+          "operation_type": {
+            "S": "1"
+          }
+        }
+      },
+      "RSI": {
+        "M": {
+          "rsi_buy_threshold": {
+            "N": "30"
+          },
+          "rsi_length": {
+            "N": "10"
+          },
+          "rsi_sell_threshold": {
+            "N": "70"
+          }
+        }
+      }
+    }
+  },
+  "name": {
+    "S": "bollingerUptrendContinuationBuy"
+  },
+  "symbols": {
+    "L": [
+      {
+        "S": "BTC/USDT"
+      },
+      {
+        "S": "ETH/USDT"
+      },
+      {
+        "S": "SOL/USDT"
+      }
+    ]
+  }
+}

@@ -1,8 +1,10 @@
 import typing as t
 
 from indicators.InvertedHammer import InvertedHammer
+from indicators.aboveEMA import AboveEMA
 from indicators.adxRange import ADXRange
 from indicators.bearishCandlePattern import BearishCandlePattern
+from indicators.belowEMA import BelowEMA
 from indicators.bollingerBandReEntry import BollingerBandReEntry
 from indicators.bollingerBandWidth import BollingerBandWidth
 from indicators.bullishCandlePattern import BullishCandlePattern
@@ -72,7 +74,9 @@ INDICATOR_MAP = {
     "StochasticRSICross": StochasticRSICross,
     "ADXRange": ADXRange,
     "DMPRange": DMPRange,
-    "DMNRange": DMNRange
+    "DMNRange": DMNRange,
+    "BelowEMA": BelowEMA,
+    "AboveEMA": AboveEMA
 }
 
 def get_indicator_instance(name: str, all_params: dict, offset: int | None) -> Indicator:

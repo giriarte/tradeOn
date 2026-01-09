@@ -36,7 +36,7 @@ class BollingerBandWidth(Indicator):
             std = float(params.get(BB_STD, 2.0))
             var_min = params.get(BB_VARIATION_MIN, 3.0)
             var_max = params.get(BB_VARIATION_MAX)
-            operation_type = params.get(OPERATION_TYPE, SIGNAL_BUY)
+            operation_type =int(params.get(OPERATION_TYPE, SIGNAL_BUY))
         except (ValueError, TypeError):
             return SIGNAL_HOLD
 

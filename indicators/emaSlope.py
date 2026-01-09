@@ -6,6 +6,7 @@ from indicators.constants import (
     CLOSE_COLUMN,
     EMA_LENGTH,
     LOOKBACK,
+    MIN_RAW_SLOPE_PCT,
     MIN_SLOPE_PCT,
     OPERATION_TYPE,
     SIGNAL_BUY,
@@ -31,8 +32,9 @@ class EMASlope(Indicator):
         # --- 1. Parameter Extraction ---
         try:
             ema_length = int(params.get(EMA_LENGTH, 20))
-            lookback = int(params.get(LOOKBACK, 5))
+            lookback = int(params.get(LOOKBACK, 10))
             min_slope_pct = float(params.get(MIN_SLOPE_PCT, 1.0))
+            min_raw_slope_pct = float(params.get(MIN_RAW_SLOPE_PCT, 0.0))
             # Default to SIGNAL_BUY as a "Trend Active" confirmation
             operation_type = int(params.get(OPERATION_TYPE, SIGNAL_BUY))
         except (ValueError, TypeError):
@@ -60,10 +62,20 @@ class EMASlope(Indicator):
         raw_slope_pct = ((current_ema - previous_ema) / previous_ema) * 100
         abs_slope_pct = abs(raw_slope_pct)
 
+        # Threshold logic, First check for the raw slope (if any), 
+        # this will consider the raw slope including movements upwards or downwards
+        if min_raw_slope_pct > 0 and raw_slope_pct >= min_raw_slope_pct:
+            print(f'emaSlope identified with raw slope percentage ${raw_slope_pct} exceeding minimum ${min_raw_slope_pct}')
+            return operation_type
+        
+        if min_raw_slope_pct < 0 and raw_slope_pct <= min_raw_slope_pct:
+            print(f'emaSlope identified with raw slope percentage ${raw_slope_pct} exceeding minimum ${min_raw_slope_pct}')
+            return operation_type
+
         # --- 5. Threshold Logic ---
         # If the absolute percentage change is greater than our "cap" or threshold,
         # we consider the trend strong enough to trade.
-        if abs_slope_pct >= min_slope_pct:
+        if abs_slope_pct >= min_slope_pct and raw_slope_pct == 0:
             print(f'emaSlope identified with absolute slope percentage ${abs_slope_pct} exceeding minimum ${min_slope_pct}')
             return operation_type
 

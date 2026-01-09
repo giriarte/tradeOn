@@ -47,11 +47,17 @@ class BaseBacktestingStrat(Strategy):
     def init(self):
         super().init()
         self.signal1 = self.I(STRATEGY)
-        self.ratio = 1.5
-        self.risk_perc = 0.009
+        self.ratio = 1
+        self.risk_perc = 0.01
 
     def next(self):
         super().next() 
+
+        # 1. Check if we already have an open position
+        # If a position exists, we skip the rest of the logic for this candle
+        if self.position:
+            return
+        
         tradeSize = getTradeSize(150000, self.data.Close[-1], LEVERAGE)
         if self.signal1==1:
             sl1 = self.data.Close[-1] - self.data.Close[-1]*self.risk_perc
@@ -62,7 +68,7 @@ class BaseBacktestingStrat(Strategy):
             tp1 = self.data.Close[-1] - (self.data.Close[-1]*self.risk_perc)*self.ratio
             self.sell(size = tradeSize, sl=sl1, tp=tp1)
 
-data_path = os.path.abspath('tests\\historicalData1h\\crypto')
+data_path = os.path.abspath('tests\\historicalData5m\\crypto')
     
 if not os.path.isdir(data_path):
     raise FileNotFoundError(f"Directory not found: {data_path}")
@@ -95,14 +101,14 @@ for filename in os.listdir(data_path):
         # raw_data.columns = [col[0] for col in raw_data.columns]
     
         # Uncomment this line to visualize the results properly. Plot library will not produce expected results for more than 10000 rows.
-        raw_data = raw_data[0 : 10000]
+        raw_data = raw_data[0 : 20000]
 
         bt = Backtest(raw_data, BaseBacktestingStrat, cash=10000000, commission=.0002, margin=REQUIRED_MARGIN)
         stat = bt.run()
         print(stat)
         print(stat._trades)
-        plotfilename = os.path.join("plots", filename)
-        bt.plot(filename=plotfilename)
+        # plotfilename = os.path.join("plots", filename)
+        # bt.plot(filename=plotfilename)
 
         file_stats = {
             'filename': filename,

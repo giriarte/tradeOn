@@ -30,7 +30,7 @@ class NearEMA(Indicator):
         try:
             ema_length = int(params.get(EMA_LENGTH, 20))
             tolerance_pct = float(params.get(TOLERANCE_PCT, 0.5))
-            operation_type = params.get(OPERATION_TYPE, SIGNAL_BUY)
+            operation_type = int(params.get(OPERATION_TYPE, SIGNAL_BUY))
         except (ValueError, TypeError):
             print("Invalid parameters for NearEMA indicator.")
             return SIGNAL_HOLD
