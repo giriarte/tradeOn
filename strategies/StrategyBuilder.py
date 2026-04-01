@@ -21,7 +21,7 @@ def create_strategy(item: dict) -> TradeStrategy:
     # Access the raw list from the DynamoDB item (now a list of dicts/maps)
     # Structure expected: [{'name': 'EMACross', 'offset': 5}, {'name': 'ADXRange'}]
     raw_indicator_data = item.get('baseIndicators', [])
-    base_indicators = [get_indicator_instance(entry.get('name'), item.get('defaultParams', {}), entry.get('offset')) for entry in raw_indicator_data]
+    base_indicators = [get_indicator_instance(entry.get('name'), entry.get('params', {}), entry.get('offset')) for entry in raw_indicator_data]
 
     # 3. Build the TradeStrategy
     return TradeStrategy(
@@ -30,6 +30,5 @@ def create_strategy(item: dict) -> TradeStrategy:
         categoryAPosition=category_a,
         brokerId=item.get('brokerId'),
         symbols=item.get('symbols', []),
-        candleInterval=item.get('candleInterval'),
-        defaultParams=item.get('defaultParams', {})
+        candleInterval=item.get('candleInterval')
     )

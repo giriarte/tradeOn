@@ -35,7 +35,7 @@ class DMNRange(Indicator):
             length = int(params.get(ADX_LENGTH, 14))
             dmn_min = params.get(DMN_MIN)
             dmn_max = params.get(DMN_MAX)
-            operation_type = params.get(OPERATION_TYPE, SIGNAL_SELL)
+            operation_type = int(params.get(OPERATION_TYPE, SIGNAL_SELL))
         except (ValueError, TypeError):
             print("Invalid parameters provided to DMNRange indicator.")
             return SIGNAL_HOLD

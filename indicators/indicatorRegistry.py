@@ -85,13 +85,10 @@ INDICATOR_MAP = {
     "CustomCandle": CustomCandle
 }
 
-def get_indicator_instance(name: str, all_params: dict, offset: int | None) -> Indicator:
+def get_indicator_instance(name: str, params: dict, offset: int | None) -> Indicator:
     indicator_class = INDICATOR_MAP.get(name)
     if not indicator_class:
         raise ValueError(f"Indicator implementation for '{name}' not found.")
-    
-    # Extract specific params for this indicator
-    specific_params = all_params.get(name, {})
-    
-    print(f"Creating indicator '{name}' with params: {specific_params}")
-    return indicator_class(name=name, params=specific_params, offset=offset)
+        
+    print(f"Creating indicator '{name}' with params: {params}")
+    return indicator_class(name=name, params=params, offset=offset)

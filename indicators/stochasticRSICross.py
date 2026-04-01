@@ -39,7 +39,7 @@ class StochasticRSICross(Indicator):
             k_smoothing = int(params.get(K_PERIOD, 3))
             d_smoothing = int(params.get(D_PERIOD, 3))
             threshold = params.get(THRESHOLD)
-            operation_type = params.get(OPERATION_TYPE, SIGNAL_BUY)
+            operation_type = int(params.get(OPERATION_TYPE, SIGNAL_BUY))
         except (ValueError, TypeError):
             print("Invalid parameters provided to StochasticRSICross indicator.")
             return SIGNAL_HOLD

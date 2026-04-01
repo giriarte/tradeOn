@@ -30,8 +30,7 @@ def STRATEGY():
                                          ThreeGreenCandlesRsi.categoryAPosition,
                                          brokerId="test_broker",
                                          symbols=ThreeGreenCandlesRsi.symbols,
-                                         candleInterval=ThreeGreenCandlesRsi.candleInterval,
-                                         defaultParams=ThreeGreenCandlesRsi.defaultParams)
+                                         candleInterval=ThreeGreenCandlesRsi.candleInterval)
 
     # Iterate through the data frame and append the strategy_output column
     strategy_output = [0]*len(raw_data)

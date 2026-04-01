@@ -13,15 +13,13 @@ class TradeStrategy:
                   categoryAPosition: Position,
                   brokerId: str,
                   symbols: t.List[str],
-                  candleInterval: str,
-                  defaultParams: Dictionary = None):
+                  candleInterval: str):
         self.name = name
         self.baseIndicators = baseIndicators
         self.categoryAPosition = categoryAPosition
         self.brokerId = brokerId
         self.symbols = symbols
         self.candleInterval = candleInterval
-        self.defaultParams = defaultParams if defaultParams is not None else {}
 
     """
     Interface for a trading strategy, defining the required attributes and methods
@@ -45,7 +43,6 @@ class TradeStrategy:
     brokerId: str
     symbols: t.List[str] = [] # The coin pairs to which this strategy will apply
     candleInterval: str  # Represents the data interval (e.g., 1 day).
-    defaultParams: Dictionary = {} # Inidicators parameters
 
     def evaluate(self, data: t.Any, params: t.Optional[Dictionary] = None) -> t.Optional[Position]:
         """

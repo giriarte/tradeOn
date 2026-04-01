@@ -55,8 +55,8 @@ class RSI(Indicator):
 
         # 2. Extract thresholds and current RSI value
         current_rsi = data.RSI.iloc[-1]
-        buy_threshold = current_params.get(RSI_BUY_THRESHOLD, 30)
-        sell_threshold = current_params.get(RSI_SELL_THRESHOLD, 70)
+        buy_threshold = float(current_params.get(RSI_BUY_THRESHOLD, 30))
+        sell_threshold = float(current_params.get(RSI_SELL_THRESHOLD, 70))
         
         output = SIGNAL_HOLD
 

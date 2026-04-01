@@ -29,7 +29,7 @@ class ClosePrice(Indicator):
         try:
             target_level = float(params.get(TARGET_LEVEL))
             tolerance_pct = float(params.get(TOLERANCE_PCT, 0.5))
-            operation_type = params.get(OPERATION_TYPE, SIGNAL_BUY)
+            operation_type = int(params.get(OPERATION_TYPE, SIGNAL_BUY))
         except (ValueError, TypeError, KeyError):
             print("Error: Invalid parameters for ClosePrice indicator.")
             # If target_level is missing or invalid, we cannot evaluate
