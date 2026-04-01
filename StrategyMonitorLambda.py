@@ -196,7 +196,7 @@ def invoke(event, context):
 
             print("Downloading data...")
             # raw_data = yf.download(tickers='BTC-USD', period='5d', interval='5m') // This is the yfinance version...
-            raw_data = download_binance_data(symbol=symbol, timeframe='5m')
+            raw_data = download_binance_data(symbol=symbol, timeframe=strategy.candleInterval, limit=400)
             strategy_position_output = strategy.evaluate(raw_data, None)
             if strategy_position_output:
                 alert_message = f"Strategy {strategy.name} generated a signal: {strategy_position_output.type} for symbol: {symbol}"
