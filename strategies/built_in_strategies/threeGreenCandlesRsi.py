@@ -20,6 +20,7 @@ from indicators.constants import (
     RSI_LENGTH, 
     RSI_SELL_THRESHOLD
 )
+from indicators.customCandle import CustomCandle
 from indicators.dmnRange import DMNRange
 from indicators.dmpRange import DMPRange
 from indicators.doji import Doji
@@ -34,6 +35,7 @@ from indicators.hammer import Hammer
 from indicators.hangingMan import HangingMan
 from indicators.harami import Harami
 from indicators.indicator import Indicator
+from indicators.longCandle import LongCandle
 from indicators.macdCross import MACDCross
 from indicators.macdDivergence import MACDDivergence
 from indicators.morningStar import MorningStar
@@ -48,14 +50,12 @@ from indicators.rsi import RSI
 from indicators.shootingStar import ShootingStar
 from indicators.stochasticRSICross import StochasticRSICross
 from indicators.stochasticRSILevel import StochasticRSILevel
-from strategies.strategy import TradeStrategy, Position
+from indicators.volumeBreakout import VolumeBreakout
+from model.strategy import TradeStrategy, Position
 
 Dictionary = t.Dict[str, t.Dict[str, t.Any]] # Represents the default parameters map
 
 class ThreeGreenCandlesRsi(TradeStrategy):
-    rsiLength = 26
-    rsiBuyThreshold = 30
-    rsiSellThreshold = 70
     nCandlesLength = 3
     nCandlesOperation = 2
     nCandlesOffset = 0
@@ -65,13 +65,18 @@ class ThreeGreenCandlesRsi(TradeStrategy):
 
     defaultParams: Dictionary = {
         "RSI": {
-                RSI_LENGTH: rsiLength,
-                RSI_BUY_THRESHOLD: rsiBuyThreshold,
-                RSI_SELL_THRESHOLD: rsiSellThreshold,
-                OPERATION_TYPE: 2,
-            },
-        "NRedCandles": {
-            N_CANDLES_LENGTH: 3,
+            RSI_LENGTH: 16,
+            RSI_BUY_THRESHOLD: 45,
+            RSI_SELL_THRESHOLD: 55,
+            OPERATION_TYPE: 1,
+        },
+        "NRedCandles": {    
+            N_CANDLES_LENGTH: 1,
+            N_CANDLES_OPERATION: 2,
+            N_CANDLES_OFFSET: 0
+        },
+        "NGreenCandles": {
+            N_CANDLES_LENGTH: 1,
             N_CANDLES_OPERATION: 1,
             N_CANDLES_OFFSET: 0
         },
@@ -86,7 +91,7 @@ class ThreeGreenCandlesRsi(TradeStrategy):
         },
         "MACDDivergence": {
             "bb_variation_min": 4.0,
-            OPERATION_TYPE: 1
+            OPERATION_TYPE: 2
         },
         "NearSupport": {
             "support_lookback": 100,
@@ -111,16 +116,16 @@ class ThreeGreenCandlesRsi(TradeStrategy):
         },
         "EMASlope": {
             OPERATION_TYPE: 1,
-            "lookback": 100,
-            "ema_length": 50,
-            MIN_RAW_SLOPE_PCT: 0.7
+            "lookback": 20,
+            "ema_length":50,
+            MIN_RAW_SLOPE_PCT: 0.1
         },
         "AboveEMA": {
             "ema_length": 200,
             OPERATION_TYPE: 1
         },
         "BearishCandlePattern": {
-            OPERATION_TYPE: 1
+            OPERATION_TYPE: 2
         },
         "ADXRange": {
             "adx_min": 25,
@@ -130,19 +135,34 @@ class ThreeGreenCandlesRsi(TradeStrategy):
             OPERATION_TYPE: 1
         },
         "EMACross": {
-            OPERATION_TYPE: 1,
+            OPERATION_TYPE: 2,
             "ema_low": 21,
             "ema_high": 55
+        },
+        "CustomCandle": { # Customizing as a bearish hammer
+            OPERATION_TYPE: 1,
+            "upper_wick_min": 0,
+            "upper_wick_max": 20, # 10 for automated, 20 for manual verification
+            "lower_wick_min": 50, # 50 for automated, 35 for manual verification
+            "lower_wick_max": 100
+        },
+        "LongCandle": {
+            OPERATION_TYPE: 1,
+            "multiplier": 1.5,
         }
     } # Inidicators parameters
 
     # Lists of Indicators
     baseIndicators: t.List[Indicator] = [
-        # NGreenCandles("NGreenCandles", defaultParams.get("NGreenCandles", {})),
-        # BollingerBandWidth("BollingerBandWidth", defaultParams.get("BollingerBandWidth", {}), 0),
-        # BullishCandlePattern("BullishCandlePattern", defaultParams.get("BullishCandlePattern", {}), 0),
-        EMACross("EMACross", defaultParams.get("EMACross", {}), 4),
-        BearishCandlePattern("BearishCandlePattern", defaultParams.get("BearishCandlePattern", {}), 0),
+        CustomCandle("CustomCandle", defaultParams.get("CustomCandle", {})), # Customizing as a bullish hammer this time.
+        LongCandle("LongCandle", defaultParams.get("LongCandle", {}), 0),
+        RSI("RSI", defaultParams.get("RSI", {}), 1),
+        NGreenCandles("NGreenCandles", defaultParams.get("NGreenCandles", {}), 0),
+        #NRedCandles("NRedCandles", defaultParams.get("NRedCandles", {}), 0),
+        # PriceBelowBollingerBand("PriceBelowBollingerBand", defaultParams.get("PriceBelowBollingerBand", {}), 1),
+        # BollingerBandReEntry("BollingerBandReEntry", defaultParams.get("BollingerBandReEntry", {}), 0),
+        #BearishCandlePattern("BearishCandlePattern", defaultParams.get("BearishCandlePattern", {}), 0)
+        # EMASlope("EMASlope", defaultParams.get("EMASlope", {}), 1)
     ] # Indicators here are mandatory conditions to generate a position
 
     enhancers: t.List[Indicator] = [] # Enhancers indicators can increase the position category

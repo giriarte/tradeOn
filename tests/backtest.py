@@ -5,6 +5,7 @@ import sys
 import pandas as pd
 import os
 import numpy as np
+import pandas_ta as ta
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -43,12 +44,16 @@ def STRATEGY():
             strategy_output[i] = None
     return strategy_output
 
-class BaseBacktestingStrat(Strategy):  
+class BaseBacktestingStrat(Strategy): 
+    rsi_window = 16
     def init(self):
         super().init()
         self.signal1 = self.I(STRATEGY)
         self.ratio = 1
-        self.risk_perc = 0.01
+        self.risk_perc = 0.0004
+        # self.I() registers the indicator for the plotting engine
+        # It takes: (function, data, additional_params)
+        self.rsi = self.I(lambda x: ta.rsi(pd.Series(x), length=self.rsi_window), self.data.Close)
 
     def next(self):
         super().next() 
@@ -68,7 +73,7 @@ class BaseBacktestingStrat(Strategy):
             tp1 = self.data.Close[-1] - (self.data.Close[-1]*self.risk_perc)*self.ratio
             self.sell(size = tradeSize, sl=sl1, tp=tp1)
 
-data_path = os.path.abspath('tests\\historicalData5m\\crypto')
+data_path = os.path.abspath('tests\\historicalData5m\\fxify')
     
 if not os.path.isdir(data_path):
     raise FileNotFoundError(f"Directory not found: {data_path}")
@@ -84,6 +89,7 @@ for filename in os.listdir(data_path):
 
         raw_data = pd.read_csv(file_path, index_col=0, parse_dates=True)
         raw_data.index = pd.to_datetime(raw_data.index, format="%d.%m.%Y %H:%M:%S.%f")
+        #raw_data.index = pd.to_datetime(raw_data.index, format="%Y-%m-%d %H:%M")
         raw_data['Open'] = pd.to_numeric(raw_data['Open'], errors='coerce')
         raw_data['Close'] = pd.to_numeric(raw_data['Close'], errors='coerce')
         raw_data['High'] = pd.to_numeric(raw_data['High'], errors='coerce')
@@ -103,12 +109,12 @@ for filename in os.listdir(data_path):
         # Uncomment this line to visualize the results properly. Plot library will not produce expected results for more than 10000 rows.
         raw_data = raw_data[0 : 20000]
 
-        bt = Backtest(raw_data, BaseBacktestingStrat, cash=10000000, commission=.0002, margin=REQUIRED_MARGIN)
+        bt = Backtest(raw_data, BaseBacktestingStrat, cash=10000000, commission=.0001, margin=REQUIRED_MARGIN)
         stat = bt.run()
         print(stat)
         print(stat._trades)
-        # plotfilename = os.path.join("plots", filename)
-        # bt.plot(filename=plotfilename)
+        plotfilename = os.path.join("plots", filename)
+        bt.plot(filename=plotfilename, resample=False)
 
         file_stats = {
             'filename': filename,

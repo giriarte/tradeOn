@@ -13,7 +13,7 @@ if project_root not in sys.path:
 # --- Imports (Keep as is) ---
 from indicators.rsi import RSI
 from indicators.nRedCandles import NRedCandles
-from strategies.strategy import TradeStrategy
+from model.strategy import TradeStrategy
 from strategies.position import Position
 from indicators.constants import ( 
     CLOSE_COLUMN,

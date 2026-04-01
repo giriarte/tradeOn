@@ -72,6 +72,12 @@ class TradeonCoreStack(Stack):
             projection_type=dynamodb.ProjectionType.KEYS_ONLY,
         )
 
+        # GSI for userId
+        self.users_table.add_global_secondary_index(
+            index_name="USERS_USERID_GSI",
+            partition_key=dynamodb.Attribute(name="userId", type=dynamodb.AttributeType.STRING),
+            projection_type=dynamodb.ProjectionType.KEYS_ONLY,
+        )
 
         # --- 2. Trades Table ---
         self.trades_table = dynamodb.Table(

@@ -1,7 +1,13 @@
-import yfinance as yf
-import ccxt
 import sys
 import os
+
+# --- System Path Setup ---
+project_root = os.path.abspath(os.path.dirname(__file__))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+import yfinance as yf
+import ccxt
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import numpy as np
@@ -11,27 +17,14 @@ from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key
 import typing as t
 import pandas_ta as ta
+
+# --- Imports ---
 from strategies.StrategyBuilder import create_strategy
-
-dynamodb = boto3.resource('dynamodb')
-users_table = dynamodb.Table('Users')
-strategies_table = dynamodb.Table('Strategies')
-# Initialize the SNS client
-sns_client = boto3.client('sns', region_name='us-east-1')
-TOPIC_ARN = "arn:aws:sns:us-east-1:542557037063:TradeNotification"
-
-# --- System Path Setup (Keep as is) ---
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
-
-# --- Imports (Keep as is) ---
 from indicators.rsi import RSI
 from indicators.nRedCandles import NRedCandles
-from strategies.strategy import TradeStrategy
+from model.strategy import TradeStrategy
 from strategies.position import Position
-from indicators.constants import ( 
+from indicators.constants import (
     CLOSE_COLUMN,
     OPEN_COLUMN,
     N_CANDLES_LENGTH,
@@ -40,6 +33,12 @@ from indicators.constants import (
     RSI_BUY_THRESHOLD,
     RSI_SELL_THRESHOLD
 )
+
+dynamodb = boto3.resource('dynamodb')
+users_table = dynamodb.Table('Users')
+strategies_table = dynamodb.Table('Strategies')
+sns_client = boto3.client('sns', region_name='us-east-1')
+TOPIC_ARN = "arn:aws:sns:us-east-1:542557037063:TradeNotification"
 
 # --- Helper Functions (Keep as is) ---
 def pointpos(x, xsignal):
@@ -208,7 +207,7 @@ def invoke(event, context):
                     response = sns_client.publish(
                         TopicArn=TOPIC_ARN,
                         Message=alert_message,
-                        Subject=f"Trading Alert: {strategy.name}"
+                        Subject=f"Trading Alert: Strategy {strategy.name} triggered for Symbol {symbol}"
                     )
                     print(f"Notification sent! Message ID: {response['MessageId']}")
                     
@@ -324,10 +323,11 @@ def getUserDetails(email, user_id):
         return {"statusCode": 500, "body": "Internal Server Error"}
 
 
-user_payload = {
-    "email": "a.g.iriarte@gmail.com",
-    "userId": "12344",
-    "testMode": True
-}
+# TODO: Uncomment this for local testing. Remember to comment it back before deploying to Lambda, as Lambda will invoke the 'invoke' function directly.
+# user_payload = {
+#     "email": "a.g.iriarte@gmail.com",
+#     "userId": "12344",
+#     "testMode": True
+# }
 
-invoke(user_payload, None)
+# invoke(user_payload, None)

@@ -9,6 +9,7 @@ from indicators.bollingerBandReEntry import BollingerBandReEntry
 from indicators.bollingerBandWidth import BollingerBandWidth
 from indicators.bullishCandlePattern import BullishCandlePattern
 from indicators.closePrice import ClosePrice
+from indicators.customCandle import CustomCandle
 from indicators.dmnRange import DMNRange
 from indicators.dmpRange import DMPRange
 from indicators.doji import Doji
@@ -23,6 +24,7 @@ from indicators.hammer import Hammer
 from indicators.hangingMan import HangingMan
 from indicators.harami import Harami
 from indicators.indicator import Indicator
+from indicators.longCandle import LongCandle
 from indicators.macdCross import MACDCross
 from indicators.macdDivergence import MACDDivergence
 from indicators.morningStar import MorningStar
@@ -37,6 +39,7 @@ from indicators.rsi import RSI
 from indicators.shootingStar import ShootingStar
 from indicators.stochasticRSICross import StochasticRSICross
 from indicators.stochasticRSILevel import StochasticRSILevel
+from indicators.volumeBreakout import VolumeBreakout
 
 # --- Indicator Registry ---
 # Map the string name in DynamoDB to the class implementation
@@ -76,7 +79,10 @@ INDICATOR_MAP = {
     "DMPRange": DMPRange,
     "DMNRange": DMNRange,
     "BelowEMA": BelowEMA,
-    "AboveEMA": AboveEMA
+    "AboveEMA": AboveEMA,
+    "VolumeBreakout": VolumeBreakout,
+    "LongCandle": LongCandle,
+    "CustomCandle": CustomCandle
 }
 
 def get_indicator_instance(name: str, all_params: dict, offset: int | None) -> Indicator:

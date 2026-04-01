@@ -1,6 +1,6 @@
 from indicators.indicatorRegistry import get_indicator_instance
 from strategies.position import Position
-from strategies.strategy import TradeStrategy
+from model.strategy import TradeStrategy
 
 
 def create_strategy(item: dict) -> TradeStrategy:
