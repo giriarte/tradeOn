@@ -33,4 +33,5 @@ def create_strategy(item: dict) -> TradeStrategy:
         candleInterval=item.get('candleInterval'),
         strategyId=item.get('strategyId'),
         userId=item.get('userId'),
+        cooldownInterval=int(item['cooldownInterval']) if item.get('cooldownInterval') is not None else None,
     )

@@ -4,6 +4,8 @@ import uuid
 import time
 from datetime import datetime, timezone
 
+from model import strategy
+
 # --- System Path Setup ---
 project_root = os.path.abspath(os.path.dirname(__file__))
 if project_root not in sys.path:
@@ -45,6 +47,33 @@ sns_client = boto3.client('sns', region_name='us-east-1')
 TOPIC_ARN = "arn:aws:sns:us-east-1:542557037063:TradeNotification"
 
 TTL_6_MONTHS_SECONDS = 180 * 24 * 60 * 60
+
+def is_in_cooldown(strategy):
+    print(f"Checking cooldown for strategy {strategy.strategyId} with cooldown interval of {strategy.cooldownInterval} minutes.")
+    if not strategy.cooldownInterval:
+        return False
+
+    try:
+        response = alerts_table.query(
+            KeyConditionExpression=Key('strategyId').eq(strategy.strategyId)
+        )
+        items = response.get('Items', [])
+
+        print(f"Cooldown check for strategy {strategy.strategyId}: Found {len(items)} past alerts.")
+
+        if not items:
+            return False
+
+        latest = max(items, key=lambda x: x['alertTime'])
+        last_alert_time = datetime.fromisoformat(latest['alertTime'])
+        minutes_elapsed = (datetime.now(timezone.utc) - last_alert_time).total_seconds() / 60
+
+        print(f"Cooldown check for strategy {strategy.strategyId}: Last alert at {last_alert_time}, {minutes_elapsed:.2f} minutes ago.")
+
+        return minutes_elapsed < strategy.cooldownInterval
+    except Exception as e:
+        print(f"Error checking cooldown for strategy {strategy.strategyId}: {e}")
+        return False
 
 def store_alert(strategy, symbol, signal_type):
     alert_id = str(uuid.uuid4())
@@ -221,6 +250,10 @@ def invoke(event, context):
             raw_data = download_binance_data(symbol=symbol, timeframe=strategy.candleInterval, limit=400)
             strategy_position_output = strategy.evaluate(raw_data, None)
             if strategy_position_output:
+                if is_in_cooldown(strategy):
+                    print(f"Strategy {strategy.name} is in cooldown ({strategy.cooldownInterval}m). Skipping notification for symbol: {symbol}")
+                    continue
+
                 alert_message = f"Strategy {strategy.name} generated a signal: {strategy_position_output.type} for symbol: {symbol}"
                 print(alert_message)
 

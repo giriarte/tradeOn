@@ -15,7 +15,8 @@ class TradeStrategy:
                   symbols: t.List[str],
                   candleInterval: str,
                   strategyId: str = None,
-                  userId: str = None):
+                  userId: str = None,
+                  cooldownInterval: int = None):
         self.name = name
         self.baseIndicators = baseIndicators
         self.categoryAPosition = categoryAPosition
@@ -24,6 +25,7 @@ class TradeStrategy:
         self.candleInterval = candleInterval
         self.strategyId = strategyId
         self.userId = userId
+        self.cooldownInterval = cooldownInterval
 
     """
     Interface for a trading strategy, defining the required attributes and methods
@@ -47,6 +49,7 @@ class TradeStrategy:
     brokerId: str
     symbols: t.List[str] = [] # The coin pairs to which this strategy will apply
     candleInterval: str  # Represents the data interval (e.g., 1 day).
+    cooldownInterval: int  # Minimum interval (in minutes) between consecutive trades.
 
     def evaluate(self, data: t.Any, params: t.Optional[Dictionary] = None) -> t.Optional[Position]:
         """
