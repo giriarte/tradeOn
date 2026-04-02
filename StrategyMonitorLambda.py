@@ -1,5 +1,8 @@
 import sys
 import os
+import uuid
+import time
+from datetime import datetime, timezone
 
 # --- System Path Setup ---
 project_root = os.path.abspath(os.path.dirname(__file__))
@@ -37,8 +40,27 @@ from indicators.constants import (
 dynamodb = boto3.resource('dynamodb')
 users_table = dynamodb.Table('Users')
 strategies_table = dynamodb.Table('Strategies')
+alerts_table = dynamodb.Table('Alerts')
 sns_client = boto3.client('sns', region_name='us-east-1')
 TOPIC_ARN = "arn:aws:sns:us-east-1:542557037063:TradeNotification"
+
+TTL_6_MONTHS_SECONDS = 180 * 24 * 60 * 60
+
+def store_alert(strategy, symbol, signal_type):
+    alert_id = str(uuid.uuid4())
+    alert_time = datetime.now(timezone.utc).isoformat()
+    ttl = int(time.time()) + TTL_6_MONTHS_SECONDS
+
+    alerts_table.put_item(Item={
+        'strategyId': strategy.strategyId,
+        'alertId': alert_id,
+        'userId': strategy.userId,
+        'alertTime': alert_time,
+        'symbol': symbol,
+        'signalType': signal_type,
+        'strategyName': strategy.name,
+        'ttl': ttl,
+    })
 
 # --- Helper Functions (Keep as is) ---
 def pointpos(x, xsignal):
@@ -210,7 +232,9 @@ def invoke(event, context):
                         Subject=f"Trading Alert: Strategy {strategy.name} triggered for Symbol {symbol}"
                     )
                     print(f"Notification sent! Message ID: {response['MessageId']}")
-                    
+
+                    store_alert(strategy, symbol, strategy_position_output.type)
+
                 except ClientError as e:
                     print(f"Failed to send notification: {e.response['Error']['Message']}")
 

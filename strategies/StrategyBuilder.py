@@ -30,5 +30,7 @@ def create_strategy(item: dict) -> TradeStrategy:
         categoryAPosition=category_a,
         brokerId=item.get('brokerId'),
         symbols=item.get('symbols', []),
-        candleInterval=item.get('candleInterval')
+        candleInterval=item.get('candleInterval'),
+        strategyId=item.get('strategyId'),
+        userId=item.get('userId'),
     )

@@ -135,9 +135,36 @@ class TradeonCoreStack(Stack):
                 projection_type=dynamodb.ProjectionType.KEYS_ONLY,
             )
 
+        # --- 4. Alerts Table ---
+        self.alerts_table = dynamodb.Table(
+            self,
+            "AlertsTable",
+            table_name="Alerts",
+            partition_key=dynamodb.Attribute(name="strategyId", type=dynamodb.AttributeType.STRING),
+            sort_key=dynamodb.Attribute(name="alertId", type=dynamodb.AttributeType.STRING),
+            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+            removal_policy=cdk.RemovalPolicy.DESTROY,
+            time_to_live_attribute="ttl",
+        )
+
+        # GSI for userId
+        self.alerts_table.add_global_secondary_index(
+            index_name="UserIdIndex",
+            partition_key=dynamodb.Attribute(name="userId", type=dynamodb.AttributeType.STRING),
+            projection_type=dynamodb.ProjectionType.KEYS_ONLY,
+        )
+
+        # GSI for alertTime
+        self.alerts_table.add_global_secondary_index(
+            index_name="AlertTimeIndex",
+            partition_key=dynamodb.Attribute(name="alertTime", type=dynamodb.AttributeType.STRING),
+            projection_type=dynamodb.ProjectionType.KEYS_ONLY,
+        )
+
         self.users_table.grant_read_write_data(tradeon_lambda)
         self.trades_table.grant_read_write_data(tradeon_lambda)
         self.strategies_table.grant_read_write_data(tradeon_lambda)
+        self.alerts_table.grant_read_write_data(tradeon_lambda)
 
         # ------------------------------------------------------------------
         # SNS TOPIC DEFINITION

@@ -7,19 +7,23 @@ Dictionary = t.Dict[str, t.Dict[str, t.Any]] # Represents the default parameters
 
 class TradeStrategy:
 
-    def __init__(self, 
+    def __init__(self,
                   name: str,
                   baseIndicators: t.List[Indicator],
                   categoryAPosition: Position,
                   brokerId: str,
                   symbols: t.List[str],
-                  candleInterval: str):
+                  candleInterval: str,
+                  strategyId: str = None,
+                  userId: str = None):
         self.name = name
         self.baseIndicators = baseIndicators
         self.categoryAPosition = categoryAPosition
         self.brokerId = brokerId
         self.symbols = symbols
         self.candleInterval = candleInterval
+        self.strategyId = strategyId
+        self.userId = userId
 
     """
     Interface for a trading strategy, defining the required attributes and methods
