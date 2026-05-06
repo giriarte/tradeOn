@@ -2,6 +2,7 @@ import sys
 import os
 import uuid
 import time
+import json
 from datetime import datetime, timezone
 
 from model import strategy
@@ -205,10 +206,14 @@ def download_binance_data(symbol='BNB/USDT:USDT', timeframe='5m', limit=1440):
 should_plot = True
 
 def invoke(event, context):
+    # Unwrap SQS event if triggered via StrategyMonitorQueue
+    records = event.get('Records', [])
+    payload = json.loads(records[0]['body']) if records else event
+
     # 1. Extract identifiers from the payload
-    email = event.get('email')
-    user_id = event.get('userId')
-    testMode = event.get('testMode')
+    email = payload.get('email')
+    user_id = payload.get('userId')
+    testMode = payload.get('testMode')
 
     # Data Download and Cleanup
     # raw_data = yf.download(tickers='BTC-USD', period='5d', interval='5m') // This is the yfinance version...

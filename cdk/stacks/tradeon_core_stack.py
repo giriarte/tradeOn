@@ -402,12 +402,12 @@ class TradeonCoreStack(Stack):
         # Send gathered user messages to StrategyMonitorQueue
         self.strategy_monitor_queue.grant_send_messages(active_subscription_gatherer_lambda)
 
-        # Trigger hourly — disabled by default
+        # Trigger every minute — disabled by default
         active_subscription_gatherer_rule = events.Rule(
             self,
             "ActiveSubscriptionGathererSchedule",
-            rule_name="ActiveSubscriptionGathererHourlySchedule",
-            schedule=events.Schedule.cron(minute="0", hour="*", day="*", month="*", year="*"),
+            rule_name="ActiveSubscriptionGathererMinuteSchedule",
+            schedule=events.Schedule.rate(cdk.Duration.minutes(1)),
             enabled=False,
         )
         active_subscription_gatherer_rule.add_target(
