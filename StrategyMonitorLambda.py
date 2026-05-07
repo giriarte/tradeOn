@@ -45,7 +45,7 @@ users_table = dynamodb.Table('Users')
 strategies_table = dynamodb.Table('Strategies')
 alerts_table = dynamodb.Table('Alerts')
 sns_client = boto3.client('sns', region_name='us-east-1')
-TOPIC_ARN = "arn:aws:sns:us-east-1:542557037063:TradeNotification"
+TOPIC_ARN = os.environ["SNS_TOPIC_ARN"]
 
 TTL_6_MONTHS_SECONDS = 180 * 24 * 60 * 60
 

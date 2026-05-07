@@ -42,7 +42,8 @@ class TradeonCoreStack(Stack):
             timeout=cdk.Duration.seconds(120),
 
             environment={
-                "NUMBA_CACHE_DIR": "/tmp"
+                "NUMBA_CACHE_DIR": "/tmp",
+                "SNS_TOPIC_ARN": f"arn:aws:sns:us-east-1:{self.account}:TradeNotification",
             }
         )
 
